@@ -21,7 +21,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v3
@@ -30,9 +29,7 @@ jobs:
         run: uv sync --dev
 
       - name: ruff check
-        run: |
-          ruff check .
+        run: uv run ruff check .
 
-      - name: ruff format
-        run: |
-          ruff format .
+      - name: ruff format (check)
+        run: uv run ruff format --check . 
