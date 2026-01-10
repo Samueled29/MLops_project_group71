@@ -15,18 +15,17 @@ class Model(nn.Module):
         """
         super().__init__()
         model_name = "google/vit-base-patch16-224"
-        
+
         if pretrained:
             self.model = ViTForImageClassification.from_pretrained(
-                model_name,
-                num_labels=num_classes,
-                ignore_mismatched_sizes=True
+                model_name, num_labels=num_classes, ignore_mismatched_sizes=True
             )
         else:
             from transformers import ViTConfig
+
             config = ViTConfig.from_pretrained(model_name, num_labels=num_classes)
             self.model = ViTForImageClassification(config)
-        
+
         self.processor = ViTImageProcessor.from_pretrained(model_name)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
