@@ -1,31 +1,48 @@
-import requests
 import torch
-
 import os
 from pathlib import Path
 from PIL import Image
 import torch
 import numpy as np
 from sklearn.model_selection import train_test_split
-
-# url = "https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/"
-# r = requests.get(url)
-# open("", "wb").write(r.content)
-
+import requests
+import tarfile
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
 
-
 test_size = 0.2
 seed = 42
 
 class_map = {
-    "healthy_apples": 0,
-    "disease_apples": 1,
+    "Apple__Healthy": 0,
+    "Apple__Rotten": 1,
 }
+
+def download_and_extract_data(url: str, target_dir: str, archive_name: str = "apple_data.tar.gz",remove_archive: bool = True):
+    """Download a tar.gz archive and extract it to target_dir."""
+
+    os.makedirs(target_dir, exist_ok=True)
+    archive_path = os.path.join(target_dir, archive_name)
+
+    print("Downloading dataset...")
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with open(archive_path, "wb") as f:
+            for chunk in r.iter_content(chunk_size=1024 * 1024):
+                if chunk:
+                    f.write(chunk)
+
+    print("Extracting dataset...")
+    with tarfile.open(archive_path, "r:gz") as tar:
+        tar.extractall(path=target_dir)
+
+    if remove_archive:
+        os.remove(archive_path)
+
+    print("Dataset ready at:", target_dir)
 
 def pil_to_tensor_grayscale(img: Image.Image, size: tuple[int, int] = (32, 32)) -> torch.Tensor:
     """Convert PIL image to grayscale tensor (1, H, W) in [0, 1], resized."""
@@ -33,7 +50,6 @@ def pil_to_tensor_grayscale(img: Image.Image, size: tuple[int, int] = (32, 32)) 
     img = img.resize(size, Image.BILINEAR)
     arr = np.array(img, dtype=np.float32) / 255.0
     return torch.from_numpy(arr).unsqueeze(0)
-
 
 def load_images():
     """Load images and their labels from raw data directory."""
@@ -46,6 +62,9 @@ def load_images():
             raise FileNotFoundError(f"Missing folder: {class_dir}")
 
         for img_path in class_dir.iterdir():
+            if img_path.name.startswith("."):
+                continue
+
             if img_path.suffix.lower() not in {".png", ".jpg", ".jpeg"}:
                 continue
 
@@ -91,7 +110,6 @@ def preprocess_data(raw_dir: str, processed_dir: str) -> None:
     torch.save(test_images, f"{processed_dir}/test_images.pt")
     torch.save(test_target, f"{processed_dir}/test_target.pt")
 
-
 def create_datasets(processed_dir: str) -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """Return train and test datasets for the main dataset."""
     train_images = torch.load(f"{processed_dir}/train_images.pt")
@@ -105,6 +123,9 @@ def create_datasets(processed_dir: str) -> tuple[torch.utils.data.Dataset, torch
 
 
 if __name__ == "__main__":
+    # execute the data download only if raw_data_dir is empty
+    if not RAW_DATA_DIR.exists() or not any(RAW_DATA_DIR.iterdir()):
+        download_and_extract_data(url="https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/resolve/main/apple_data.tar.gz", target_dir=RAW_DATA_DIR)
     images, targets = load_images()
     split_data(images, targets)
     preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)
