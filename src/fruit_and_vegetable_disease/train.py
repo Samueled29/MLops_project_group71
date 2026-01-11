@@ -6,15 +6,16 @@ from typing import Dict, List
 
 from fruit_and_vegetable_disease.data import PROCESSED_DATA_DIR, create_datasets
 
-#from transformers import ViTForImageClassification, ViTImageProcessor
+# from transformers import ViTForImageClassification, ViTImageProcessor
 from fruit_and_vegetable_disease.model import Model
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
+
 def resize_and_expand_channels(images: torch.Tensor) -> torch.Tensor:
     """Resize 32x32 grayscale to 224x224 RGB required by Vision Transformer."""
 
-    resized = F.interpolate(images, size=(224, 224), mode='bilinear', align_corners=False)
+    resized = F.interpolate(images, size=(224, 224), mode="bilinear", align_corners=False)
     rgb = resized.repeat(1, 3, 1, 1)
     return rgb
 
@@ -34,7 +35,7 @@ def train(lr: float = 1e-3, batch_size: int = 32, epochs: int = 10) -> None:
     statistics: Dict[str, List[float]] = {"train_loss": [], "train_accuracy": []}
     for epoch in range(epochs):
         model.train()
-        for i, (img,target) in enumerate(train_dataloader):
+        for i, (img, target) in enumerate(train_dataloader):
             img, target = img.to(DEVICE), target.to(DEVICE)
             optimizer.zero_grad()
             y_pred = model(resize_and_expand_channels(img))
@@ -48,7 +49,7 @@ def train(lr: float = 1e-3, batch_size: int = 32, epochs: int = 10) -> None:
 
             if i % 100 == 0:
                 print(f"Epoch {epoch}, iter {i}, loss: {loss.item()}")
-   
+
     print("Training complete")
 
     torch.save(model.state_dict(), "models/model.pth")
@@ -66,4 +67,3 @@ def train(lr: float = 1e-3, batch_size: int = 32, epochs: int = 10) -> None:
 
 if __name__ == "__main__":
     typer.run(train)
-

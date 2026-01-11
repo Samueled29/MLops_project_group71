@@ -18,7 +18,7 @@ def evaluate(model_checkpoint: str, batch_size: int = 32) -> None:
 
     _, test_set = create_datasets(str(PROCESSED_DATA_DIR))
     test_dataloader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False)
-    
+
     model.eval()
     correct, total = 0, 0
     with torch.no_grad():
@@ -28,7 +28,7 @@ def evaluate(model_checkpoint: str, batch_size: int = 32) -> None:
             y_pred = model(img)
             correct += (y_pred.argmax(dim=1) == target).sum().item()
             total += target.size(0)
-    
+
     accuracy = correct / total
     print(f"Test accuracy: {accuracy:.4f} ({correct}/{total})")
 

@@ -14,7 +14,7 @@ class Model(nn.Module):
             pretrained: Whether to load pretrained weights.
         """
         super().__init__()
-        #model_name = "google/vit-base-patch16-224"  # Base model (86M params)
+        model_name = "google/vit-base-patch16-224"  # Base model (86M params)
         model_name = "WinKawaks/vit-tiny-patch16-224"  # Tiny model (5M params)
 
         if pretrained:
