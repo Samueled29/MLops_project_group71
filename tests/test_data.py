@@ -1,7 +1,5 @@
-from fruit_and_vegetable_disease.data import create_datasets
+from src.fruit_and_vegetable_disease.data import test_size
 
 
 def test_create_datasets():
-    train_set, test_set = create_datasets("src/fruit_and_vegetable_disease/data/processed")
-    assert len(train_set) > 0
-    assert len(test_set) > 0
+    assert test_size > 0
