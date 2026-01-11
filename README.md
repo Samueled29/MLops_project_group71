@@ -10,3 +10,10 @@ In this project, a pretrained Vision Transformer is fine-tuned for binary classi
 ## Dataset
 
 The Fruit and Vegetable Disease dataset (https://www.kaggle.com/datasets/muhammad0subhan/fruit-and-vegetable-disease-healthy-vs-rotten/data.) contains a comprehensive collection of images for 14 different types of fruits and vegetables but for this study only apple images are used to improve focus training efficiency and relevance to Danish agricultural production.
+
+## Training of the model:
+
+The model has been trained and validated using the following commands
+uv run python -m fruit_and_vegetable_disease.train --batch-size 4 --epochs 5 --lr 0.0001
+uv run python -m fruit_and_vegetable_disease.evaluate models/model.pth --batch-size 8
+
