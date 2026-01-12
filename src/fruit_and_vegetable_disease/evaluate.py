@@ -1,5 +1,5 @@
+import sys
 import torch
-import typer
 
 from fruit_and_vegetable_disease.data import PROCESSED_DATA_DIR, create_datasets
 from fruit_and_vegetable_disease.model import Model
@@ -34,4 +34,6 @@ def evaluate(model_checkpoint: str, batch_size: int = 32) -> None:
 
 
 if __name__ == "__main__":
-    typer.run(evaluate)
+    model_path = sys.argv[1]
+    batch_size = int(sys.argv[2]) if len(sys.argv) > 2 else 32
+    evaluate(model_path, batch_size)

@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
-import typer
 from typing import Dict, List
+
+import hydra
+from omegaconf import DictConfig, OmegaConf
 
 from fruit_and_vegetable_disease.data import PROCESSED_DATA_DIR, create_datasets
 
@@ -20,20 +22,21 @@ def resize_and_expand_channels(images: torch.Tensor) -> torch.Tensor:
     return rgb
 
 
-def train(lr: float = 1e-3, batch_size: int = 32, epochs: int = 10) -> None:
+@hydra.main(version_base="1.3", config_path="../../configs", config_name="config")
+def train(cfg: DictConfig) -> None:
     """Train a model on fruit and vegetable disease dataset."""
-
-    print(f"{lr=}, {batch_size=}, {epochs=}")
+    print(OmegaConf.to_yaml(cfg))
+    torch.manual_seed(cfg.seed)
 
     train_set, _ = create_datasets(str(PROCESSED_DATA_DIR))
-    train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
+    train_dataloader = torch.utils.data.DataLoader(train_set, cfg.experiments.batch_size, shuffle=True)
 
     model = Model(num_classes=2).to(DEVICE)
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = hydra.utils.instantiate(cfg.optimizer, params=model.parameters())
     loss_fn = torch.nn.CrossEntropyLoss()
 
     statistics: Dict[str, List[float]] = {"train_loss": [], "train_accuracy": []}
-    for epoch in range(epochs):
+    for epoch in range(cfg.experiments.epochs):
         model.train()
         for i, (img, target) in enumerate(train_dataloader):
             img, target = img.to(DEVICE), target.to(DEVICE)
@@ -66,4 +69,4 @@ def train(lr: float = 1e-3, batch_size: int = 32, epochs: int = 10) -> None:
 
 
 if __name__ == "__main__":
-    typer.run(train)
+    train()
