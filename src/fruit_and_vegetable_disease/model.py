@@ -43,6 +43,6 @@ class Model(nn.Module):
 
 
 if __name__ == "__main__":
-    model = Model(num_classes=10)
+    model = Model(num_classes=2)
     x = torch.rand(1, 3, 224, 224)
     print(f"Output shape of model: {model(x).shape}")
