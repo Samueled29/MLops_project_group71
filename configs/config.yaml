@@ -1,0 +1,14 @@
+defaults:
+  - dataset: apple
+  - model: vit_tiny
+  - optimizer: adam
+  - experiments: base
+  - _self_
+
+seed: 42
+
+hydra:
+  run:
+    dir: outputs/${dataset.name}/${now:%Y-%m-%d_%H-%M-%S}
+  job:
+    chdir: false

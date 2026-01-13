@@ -1,0 +1,4 @@
+# configs/model/vit_base.yaml
+name: vit_base
+model_name: google/vit-base-patch16-224
+pretrained: true

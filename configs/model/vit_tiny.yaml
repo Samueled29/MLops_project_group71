@@ -1,0 +1,4 @@
+# configs/model/vit_tiny.yaml
+name: vit_tiny
+model_name: WinKawaks/vit-tiny-patch16-224
+pretrained: true
