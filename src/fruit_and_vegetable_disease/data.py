@@ -69,7 +69,7 @@ def load_images(raw_dir: str):
     if not raw_dir.exists():
         raise FileNotFoundError(f"Missing folder: {raw_dir}")
 
-    valid_dirs = {p.name for p in raw_dir.iterdir() if p.is_dir()} # take only directories
+    valid_dirs = {p.name for p in raw_dir.iterdir() if p.is_dir()}  # take only directories
 
     for class_name, label in class_map.items():
         if class_name not in valid_dirs:
@@ -90,8 +90,8 @@ def load_images(raw_dir: str):
             images.append(pil_to_tensor_grayscale(img))
             targets.append(label)
 
-    images = torch.stack(images)      # (N, 1, H, W)
-    targets = torch.tensor(targets)   # (N,)
+    images = torch.stack(images)  # (N, 1, H, W)
+    targets = torch.tensor(targets)  # (N,)
     return images, targets
 
 
