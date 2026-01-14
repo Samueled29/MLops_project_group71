@@ -59,29 +59,39 @@ def pil_to_tensor_grayscale(img: Image.Image, size: tuple[int, int] = (32, 32)) 
     return torch.from_numpy(arr).unsqueeze(0)
 
 
-def load_images():
+def load_images(raw_dir: str):
     """Load images and their labels from raw data directory."""
     images = []
     targets = []
 
+    raw_dir = Path(raw_dir)
+
+    if not raw_dir.exists():
+        raise FileNotFoundError(f"Missing folder: {raw_dir}")
+
+    valid_dirs = {p.name for p in raw_dir.iterdir() if p.is_dir()} # take only directories
+
     for class_name, label in class_map.items():
-        class_dir = RAW_DATA_DIR / class_name
-        if not class_dir.exists():
-            raise FileNotFoundError(f"Missing folder: {class_dir}")
+        if class_name not in valid_dirs:
+            continue
 
-        for img_path in class_dir.iterdir():
-            if img_path.name.startswith("."):
+        class_dir = raw_dir / class_name
+
+        for img_path in os.listdir(class_dir):
+            if img_path.startswith("."):
                 continue
 
-            if img_path.suffix.lower() not in {".png", ".jpg", ".jpeg"}:
+            if os.path.splitext(img_path)[1].lower() not in {".png", ".jpg", ".jpeg"}:
                 continue
 
-            img = Image.open(img_path).convert("RGB")
+            full_img_path = class_dir / img_path
+            img = Image.open(full_img_path).convert("RGB")
+
             images.append(pil_to_tensor_grayscale(img))
             targets.append(label)
 
-    images = torch.stack(images)  # (N, 1, H, W)
-    targets = torch.tensor(targets)  # (N,)
+    images = torch.stack(images)      # (N, 1, H, W)
+    targets = torch.tensor(targets)   # (N,)
     return images, targets
 
 
@@ -95,6 +105,8 @@ def split_data(images: torch.Tensor, targets: torch.Tensor) -> tuple:
     torch.save(y_train, RAW_DATA_DIR / "train_target.pt")
     torch.save(X_test.squeeze(1), RAW_DATA_DIR / "test_images.pt")
     torch.save(y_test, RAW_DATA_DIR / "test_target.pt")
+
+    return X_train, X_test, y_train, y_test
 
 
 def normalize(images: torch.Tensor) -> torch.Tensor:
@@ -143,7 +155,7 @@ if __name__ == "__main__":
             url="https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/resolve/main/apple_data.tar.gz",
             target_dir=RAW_DATA_DIR,
         )
-    images, targets = load_images()
+    images, targets = load_images(RAW_DATA_DIR)
     split_data(images, targets)
     preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)
     create_datasets(PROCESSED_DATA_DIR)
