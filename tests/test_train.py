@@ -1,7 +1,5 @@
 import pytest
 import torch
-import torch.nn.functional as F
-from fruit_and_vegetable_disease.model import Model
 from fruit_and_vegetable_disease.train import resize_and_expand_channels
 
 

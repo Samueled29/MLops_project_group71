@@ -3,8 +3,8 @@ import os
 import torch
 import math
 from fruit_and_vegetable_disease.data import test_size, class_map
-from fruit_and_vegetable_disease.data import load_images, normalize, create_datasets, split_data
-from tests import _PATH_DATA, _PATH_RAW_DATA, _PATH_PROCESSED_DATA
+from fruit_and_vegetable_disease.data import load_images, normalize, split_data, create_datasets
+from tests import _PATH_RAW_DATA, _PATH_PROCESSED_DATA
 
 
 def test_data_directories_exist():
@@ -123,7 +123,6 @@ def test_processed_data_files_exist():
 @pytest.mark.skipif(not os.path.exists(_PATH_PROCESSED_DATA), reason="Data files not found")
 def test_create_tensor_datasets():
     """Test if create_datasets function returns valid datasets."""
-    from src.fruit_and_vegetable_disease.data import create_datasets
 
     train_set, test_set = create_datasets(processed_dir=_PATH_PROCESSED_DATA)
 
