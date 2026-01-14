@@ -3,10 +3,16 @@ import torch
 from fruit_and_vegetable_disease.model import Model
 
 
-@pytest.mark.parametrize("batch_size,num_classes",[(1, 2),(2, 5),])
+@pytest.mark.parametrize(
+    "batch_size,num_classes",
+    [
+        (1, 2),
+        (2, 5),
+    ],
+)
 def test_model_output_shape(batch_size, num_classes):
     """Test if model returns logits with correct output shape."""
-    model = Model(num_classes=num_classes, pretrained=False) # untrained model for testing to avoid downloading weights
+    model = Model(num_classes=num_classes, pretrained=False)  # untrained model for testing to avoid downloading weights
     x = torch.rand(batch_size, 3, 224, 224)
     y = model(x)
 
