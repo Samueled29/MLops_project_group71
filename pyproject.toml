@@ -60,4 +60,8 @@ explicit = true
 line-length = 120
 
 [tool.coverage.run]
-omit = ["tests/*"]
+source = ["src/fruit_and_vegetable_disease"]
+omit = [
+  "tests/*",
+  "*/_remote_module_*.py"
+  ]
