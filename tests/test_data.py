@@ -14,8 +14,7 @@ def test_data_directories_exist():
 
 
 @pytest.mark.skipif(
-    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0,
-    reason="Data files not found"
+    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0, reason="Data files not found"
 )
 def test_download_data():
     """Test if data download function works correctly."""
@@ -25,8 +24,7 @@ def test_download_data():
 
 
 @pytest.mark.skipif(
-    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0,
-    reason="Data files not found"
+    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0, reason="Data files not found"
 )
 def test_img_grayscale_tensor():
     """Test if loaded images are grayscale tensors."""
@@ -41,8 +39,7 @@ def test_load_images_folder():
 
 
 @pytest.mark.skipif(
-    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0,
-    reason="Data files not found"
+    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0, reason="Data files not found"
 )
 def test_load_images_output_shape():
     """Test if loaded images and targets have correct dimensions."""
@@ -59,8 +56,7 @@ def test_size_testset():
 
 
 @pytest.mark.skipif(
-    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0,
-    reason="Data files not found"
+    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0, reason="Data files not found"
 )
 def test_classmap_labels():
     """Test if that the unique values in the targets match the values from class_map."""
@@ -77,8 +73,7 @@ def test_classmap_labels():
 
 
 @pytest.mark.skipif(
-    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0,
-    reason="Data files not found"
+    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0, reason="Data files not found"
 )
 def test_normalize_img():
     """Test if the normalize function standardizes the images correctly."""
@@ -100,8 +95,7 @@ def test_normalize_empty_tensor():
 
 
 @pytest.mark.skipif(
-    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0,
-    reason="Data files not found"
+    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0, reason="Data files not found"
 )
 def test_split_data_sizes():
     """Test split_data function splits datasets into correct sizes and preserves all samples."""
@@ -131,7 +125,7 @@ def test_split_data_sizes():
 
 @pytest.mark.skipif(
     not os.path.exists(_PATH_PROCESSED_DATA) or len(os.listdir(_PATH_PROCESSED_DATA)) == 0,
-    reason="Data files not found"
+    reason="Data files not found",
 )
 def test_processed_data_files_exist():
     """Test if the processed data files exist after preprocessing."""
@@ -143,7 +137,7 @@ def test_processed_data_files_exist():
 
 @pytest.mark.skipif(
     not os.path.exists(_PATH_PROCESSED_DATA) or len(os.listdir(_PATH_PROCESSED_DATA)) == 0,
-    reason="Data files not found"
+    reason="Data files not found",
 )
 def test_create_tensor_datasets():
     """Test if create_datasets function returns valid datasets."""
