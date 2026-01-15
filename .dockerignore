@@ -1,0 +1,50 @@
+# --- VCS / editor ---
+.git
+.github
+.vscode
+.vs
+.idea
+
+# --- Python / env / caches ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.coverage*
+.tox/
+.nox/
+.cache/
+.ipynb_checkpoints/
+.venv/
+env/
+venv/
+
+# --- OS / misc ---
+.DS_Store
+*.swp
+*.swo
+*.log
+
+# --- Project artifacts (ML) ---
+data/
+outputs/
+wandb/
+reports/figures/
+docs/site/
+docs/_build/
+site/
+
+# --- Build / packaging leftovers ---
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+*.egg
+
+# --- Docker noise (avoid recursive contexts) ---
+Dockerfile*
+docker-compose*
+compose*
+.dockerignore

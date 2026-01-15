@@ -1,12 +1,17 @@
-FROM ghcr.io/astral-sh/uv:python3.12-alpine AS base
+FROM python:3.12-slim
 
-COPY uv.lock uv.lock
-COPY pyproject.toml pyproject.toml
+WORKDIR /app
 
-RUN uv sync --frozen --no-install-project
+# Copy project metadata first (for caching)
+COPY pyproject.toml uv.lock README.md ./
 
-COPY src src/
+# Copy source code before uv sync (uv installs the project itself)
+COPY src ./src
 
-RUN uv sync --frozen
+RUN pip install --no-cache-dir uv && uv sync --frozen
 
-ENTRYPOINT ["uv", "run", "uvicorn", "src.fruit_and_vegetable_disease.api:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY models ./models
+
+EXPOSE 8000
+
+CMD ["uv", "run", "uvicorn", "fruit_and_vegetable_disease.api:app", "--host", "0.0.0.0", "--port", "8000"]
