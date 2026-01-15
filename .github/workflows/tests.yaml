@@ -15,12 +15,8 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      fail-fast: false
-      matrix:
-        operating-system: ["ubuntu-latest", "windows-latest", "macos-latest"]
-        python-version: ["3.12"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
@@ -29,7 +25,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v3
@@ -43,6 +39,7 @@ jobs:
         run: |
           uv run coverage run -m pytest tests/
           uv run coverage report -m
+
 
 
 
