@@ -30,6 +30,7 @@ dependencies = [
     "transformers>=4.57.3",
     "typer==0.15.1",
     "uvicorn[standard]==0.34.0",
+    "wandb>=0.24.0",
 ]
 
 [dependency-groups]

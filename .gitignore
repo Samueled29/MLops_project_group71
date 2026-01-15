@@ -183,3 +183,19 @@ cython_debug/
 #logs
 /outputs/
 /logs/
+
+# Weights & Biases
+wandb/
+
+# Model checkpoints
+models/*.pth
+models/*.pt
+!models/.gitkeep
+
+# Training figures
+reports/figures/*.png
+reports/figures/*.jpg
+!reports/figures/.gitkeep
+
+# Hydra multirun outputs
+multirun/
