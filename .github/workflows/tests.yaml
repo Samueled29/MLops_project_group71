@@ -2,16 +2,22 @@ name: Unit Tests
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     runs-on: ${{ matrix.operating-system }}
     strategy:
+      fail-fast: false
       matrix:
         operating-system: ["ubuntu-latest", "windows-latest", "macos-latest"]
         python-version: ["3.12"]
@@ -24,7 +30,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-                 
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v3
@@ -38,3 +43,7 @@ jobs:
         run: |
           uv run coverage run -m pytest tests/
           uv run coverage report -m
+
+
+
+
