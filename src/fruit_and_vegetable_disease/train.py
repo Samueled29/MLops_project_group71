@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from typing import Dict, List
 
 import hydra
+import wandb
 from omegaconf import DictConfig, OmegaConf
 from torch.profiler import profile, ProfilerActivity, schedule, tensorboard_trace_handler
 
@@ -29,6 +30,14 @@ def train(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
     torch.manual_seed(cfg.seed)
 
+    wandb.init(
+        project=cfg.wandb.project,
+        entity=cfg.wandb.entity,
+        config=OmegaConf.to_container(cfg, resolve=True),
+        name=cfg.wandb.run_name,
+        reinit=True,
+    )
+
     train_set, _ = create_datasets(str(PROCESSED_DATA_DIR))
     train_dataloader = torch.utils.data.DataLoader(train_set, cfg.experiments.batch_size, shuffle=True)
 
@@ -36,9 +45,6 @@ def train(cfg: DictConfig) -> None:
     optimizer = hydra.utils.instantiate(cfg.optimizer, params=model.parameters())
     loss_fn = torch.nn.CrossEntropyLoss()
 
-    # Setup profiler - only profile first few batches to save memory
-    # wait=1: skip first batch, warmup=1: warm up on second batch,
-    # active=3: profile next 3 batches, repeat=1: only do this once
     profiler_schedule = schedule(wait=1, warmup=1, active=3, repeat=1)
 
     activities = [ProfilerActivity.CPU]
@@ -59,6 +65,10 @@ def train(cfg: DictConfig) -> None:
 
     for epoch in range(cfg.experiments.epochs):
         model.train()
+        epoch_loss = 0.0
+        epoch_accuracy = 0.0
+        num_batches = 0
+
         for i, (img, target) in enumerate(train_dataloader):
             img, target = img.to(DEVICE), target.to(DEVICE)
             optimizer.zero_grad()
@@ -66,16 +76,40 @@ def train(cfg: DictConfig) -> None:
             loss = loss_fn(y_pred, target)
             loss.backward()
             optimizer.step()
-            statistics["train_loss"].append(loss.item())
 
-            accuracy = (y_pred.argmax(dim=1) == target).float().mean().item()
-            statistics["train_accuracy"].append(accuracy)
+            batch_loss = loss.item()
+            batch_accuracy = (y_pred.argmax(dim=1) == target).float().mean().item()
+
+            statistics["train_loss"].append(batch_loss)
+            statistics["train_accuracy"].append(batch_accuracy)
+            epoch_loss += batch_loss
+            epoch_accuracy += batch_accuracy
+            num_batches += 1
 
             if i % 100 == 0:
-                print(f"Epoch {epoch}, iter {i}, loss: {loss.item()}")
+                print(f"Epoch {epoch}, iter {i}, loss: {batch_loss:.4f}, accuracy: {batch_accuracy:.4f}")
+                wandb.log(
+                    {
+                        "train/batch_loss": batch_loss,
+                        "train/batch_accuracy": batch_accuracy,
+                        "train/epoch": epoch,
+                        "train/batch": i,
+                    }
+                )
 
-            # Step profiler at each iteration
             prof.step()
+
+        avg_epoch_loss = epoch_loss / num_batches
+        avg_epoch_accuracy = epoch_accuracy / num_batches
+        print(f"Epoch {epoch} complete - Avg Loss: {avg_epoch_loss:.4f}, " f"Avg Accuracy: {avg_epoch_accuracy:.4f}")
+
+        wandb.log(
+            {
+                "train/epoch_loss": avg_epoch_loss,
+                "train/epoch_accuracy": avg_epoch_accuracy,
+                "epoch": epoch,
+            }
+        )
 
     prof.stop()
     print("Training complete")
@@ -95,9 +129,13 @@ def train(cfg: DictConfig) -> None:
     axs[1].set_title("Train accuracy")
     fig.savefig("reports/figures/training_statistics.png")
 
+    wandb.log({"training_statistics": wandb.Image("reports/figures/training_statistics.png")})
+
     # minimal usage / sanity checks
     print(f"Dataset size: {len(train_set)}")
     print(f"Model: {model.__class__.__name__}")
+
+    wandb.finish()
 
 
 if __name__ == "__main__":

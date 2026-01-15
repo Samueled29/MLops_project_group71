@@ -5,6 +5,15 @@ defaults:
   - experiments: base
   - _self_
 
+wandb:
+  project: "dtu_mlops_project"
+  entity: "mlops-kings"
+  run_name: "training-run"
+  tags: ["training", "vit"]
+  notes: "Baseline training with ViT"
+  mode: "online"
+
+
 seed: 42
 
 hydra:
