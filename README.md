@@ -16,4 +16,3 @@ The Fruit and Vegetable Disease dataset (https://www.kaggle.com/datasets/muhamma
 The model has been trained and validated using the following commands
 uv run python -m fruit_and_vegetable_disease.train --batch-size 4 --epochs 5 --lr 0.0001
 uv run python -m fruit_and_vegetable_disease.evaluate models/model.pth --batch-size 8
-
