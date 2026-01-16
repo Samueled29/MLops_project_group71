@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
+<<<<<<< Updated upstream
 from typing import Dict, List
 
 import hydra
@@ -70,12 +71,48 @@ def train(cfg: DictConfig) -> None:
         num_batches = 0
 
         for i, (img, target) in enumerate(train_dataloader):
+=======
+import typer
+
+#from transformers import ViTForImageClassification, ViTImageProcessor
+
+from fruit_and_vegetable_disease.model import Model
+from fruit_and_vegetable_disease.data import create_datasets, PROCESSED_DATA_DIR
+
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+
+def resize_and_expand_channels(images: torch.Tensor) -> torch.Tensor:
+    """Resize 32x32 grayscale to 224x224 RGB required by Vision Transformer."""
+
+    resized = F.interpolate(images, size=(224, 224), mode='bilinear', align_corners=False)
+    rgb = resized.repeat(1, 3, 1, 1)
+    return rgb
+
+
+def train(lr: float = 1e-3, batch_size: int = 32, epochs: int = 10) -> None:
+    """Train a model on fruit and vegetable disease dataset."""
+
+    print(f"{lr=}, {batch_size=}, {epochs=}")
+
+    train_set, _ = create_datasets(str(PROCESSED_DATA_DIR))
+    train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
+
+    model = Model(num_classes=2).to(DEVICE)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    loss_fn = torch.nn.CrossEntropyLoss()
+
+    statistics = {"train_loss": [], "train_accuracy": []}
+    for epoch in range(epochs):
+        model.train()
+        for i, (img,target) in enumerate(train_dataloader):
+>>>>>>> Stashed changes
             img, target = img.to(DEVICE), target.to(DEVICE)
             optimizer.zero_grad()
             y_pred = model(resize_and_expand_channels(img))
             loss = loss_fn(y_pred, target)
             loss.backward()
             optimizer.step()
+<<<<<<< Updated upstream
 
             batch_loss = loss.item()
             batch_accuracy = (y_pred.argmax(dim=1) == target).float().mean().item()
@@ -121,6 +158,18 @@ def train(cfg: DictConfig) -> None:
         print("\n=== Memory Usage ===")
         print(prof.key_averages().table(sort_by="self_cuda_memory_usage", row_limit=10))
 
+=======
+            statistics["train_loss"].append(loss.item())
+
+            accuracy = (y_pred.argmax(dim=1) == target).float().mean().item()
+            statistics["train_accuracy"].append(accuracy)
+
+            if i % 100 == 0:
+                print(f"Epoch {epoch}, iter {i}, loss: {loss.item()}")
+   
+    print("Training complete")
+
+>>>>>>> Stashed changes
     torch.save(model.state_dict(), "models/model.pth")
     fig, axs = plt.subplots(1, 2, figsize=(15, 5))
     axs[0].plot(statistics["train_loss"])
@@ -128,8 +177,11 @@ def train(cfg: DictConfig) -> None:
     axs[1].plot(statistics["train_accuracy"])
     axs[1].set_title("Train accuracy")
     fig.savefig("reports/figures/training_statistics.png")
+<<<<<<< Updated upstream
 
     wandb.log({"training_statistics": wandb.Image("reports/figures/training_statistics.png")})
+=======
+>>>>>>> Stashed changes
 
     # minimal usage / sanity checks
     print(f"Dataset size: {len(train_set)}")
@@ -139,4 +191,5 @@ def train(cfg: DictConfig) -> None:
 
 
 if __name__ == "__main__":
-    train()
+    typer.run(train)
+
