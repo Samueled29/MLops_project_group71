@@ -199,3 +199,6 @@ reports/figures/*.jpg
 
 # Hydra multirun outputs
 multirun/
+
+# Ignore credentials
+keys/
