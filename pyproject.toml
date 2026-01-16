@@ -30,7 +30,7 @@ dependencies = [
     "torch-tb-profiler>=0.4.3",
     "transformers>=4.57.3",
     "typer==0.15.1",
-    "uvicorn[standard]==0.34.0",
+    "uvicorn[standard]==0.40.0",
     "wandb>=0.24.0",
 ]
 
