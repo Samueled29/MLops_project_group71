@@ -40,9 +40,6 @@ jobs:
       - name: Run pre-commit autoupdate
         run: uv run pre-commit autoupdate
 
-      - name: Run pre-commit (all files)
-        run: uv run pre-commit run --all-files
-
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
