@@ -11,24 +11,45 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    name: tests (${{ matrix.os }}, py${{ matrix.python }}, torch${{ matrix.torch }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.12", "3.13"]
+        torch: ["2.5.1", "2.6.0"]
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python }}
 
       - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
-      - run: uv sync --all-groups --frozen
+      - name: Install dependencies (locked)
+        run: uv sync --all-groups --frozen
 
-      - run: |
+      - name: Install PyTorch (matrix override)
+        run: uv pip install --upgrade "torch==${{ matrix.torch }}" "torchvision" --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Show torch version
+        run: uv run python -c "import torch; print('torch', torch.__version__)"
+
+      - name: Run tests & coverage
+        run: |
           uv run coverage run -m pytest tests/
           uv run coverage report -m
+
+
+
+
 
 
 
