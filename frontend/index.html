@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fruit Quality Check</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+
+  <body>
+    <main class="wrap">
+      <h1>Fruit Quality Check</h1>
+      <p class="sub">Upload an image. We will tell you if it is Healthy or Rotten.</p>
+
+      <div class="card">
+        <div class="controls">
+          <input id="fileInput" type="file" accept="image/*" />
+          <button id="runBtn" type="button" disabled>Check image</button>
+        </div>
+
+        <div class="preview">
+          <img id="previewImg" class="hidden" alt="Preview" />
+          <div id="placeholder" class="placeholder">No image selected.</div>
+        </div>
+
+        <div id="result" class="result hidden">
+          <div class="label">
+            Result: <span id="pred" class="pred">—</span>
+          </div>
+          <div class="conf">
+            Confidence: <span id="conf">—</span>
+          </div>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+      </div>
+    </main>
+
+    <script type="module" src="/static/app.js"></script>
+  </body>
+</html>
