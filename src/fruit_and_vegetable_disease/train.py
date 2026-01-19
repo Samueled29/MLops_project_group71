@@ -14,7 +14,7 @@ from torch.profiler import (
     profile,
 )
 
-from fruit_and_vegetable_disease.data import PROCESSED_DATA_DIR, create_datasets
+from fruit_and_vegetable_disease.data import *
 from fruit_and_vegetable_disease.model import Model
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
@@ -51,7 +51,13 @@ def train(cfg: DictConfig) -> None:
         name=cfg.wandb.run_name,
         reinit=True,
     )
-
+    
+    if not RAW_DATA_DIR.exists() or not any(RAW_DATA_DIR.iterdir()):
+        download_and_extract_data(
+            url="https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/resolve/main/apple_data.tar.gz",
+            target_dir=RAW_DATA_DIR,
+        )
+    
     train_set, _ = create_datasets(str(PROCESSED_DATA_DIR))
     train_dataloader = torch.utils.data.DataLoader(train_set, cfg.experiments.batch_size, shuffle=True)
 
