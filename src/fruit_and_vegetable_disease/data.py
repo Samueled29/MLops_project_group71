@@ -50,20 +50,32 @@ def download_and_extract_data(
 
     print("Dataset ready at:", target_dir)
 """
-def download_and_extract_data(url: str, target_dir: str):
+def download_and_extract_data(
+    url: str, target_dir: str, archive_name: str = "training-data.tar.gz", remove_archive: bool = True
+):
     """Download and extract a tar.gz on the fly using system pipes."""
     os.makedirs(target_dir, exist_ok=True)
-    print(f"Streaming dataset from {url}...")
+
+    archive_path = os.path.join(target_dir, archive_name)
+    print(f"Downloading raw data from {url}...")
+    download_cmd = f"curl -sSL {url} -o {archive_path}"
+    download_exit_code = os.system(download_cmd)
     
-    # The -L follows redirects (needed for Hugging Face)
-    # The -xz unzips and extracts
-    # The -C changes to the target directory before unpacking
-    cmd = f"curl -L {url} | tar -xz -C {target_dir}"
-    exit_code = os.system(cmd)
-    if exit_code == 0:
-        print(f"Success! Data extracted to {target_dir}")
+    if download_exit_code != 0:
+        print("Error: raw data download failed.")
+        return
+    
+    extract_cmd = f"tar -xzf {archive_path} -C {target_dir} > /dev/null 2>&1"
+    extract_exit_code = os.system(extract_cmd)
+
+    if extract_exit_code == 0:
+        print(f"Raw data correctly extracted extracted in {target_dir}")
+        if remove_archive and os.path.exists(archive_path):
+            os.remove(archive_path)
     else:
-        print("Failed to download or extract")
+        print("Error: data extraction failed.") 
+    
+    
 
 
 def pil_to_tensor_grayscale(img: Image.Image, size: tuple[int, int] = (32, 32)) -> torch.Tensor:

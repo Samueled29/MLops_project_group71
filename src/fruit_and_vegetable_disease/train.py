@@ -52,15 +52,20 @@ def train(cfg: DictConfig) -> None:
         reinit=True,
     )
 
+    # DATA DOWNLOADING AND DATASET CREATION
     if not RAW_DATA_DIR.exists() or not any(RAW_DATA_DIR.iterdir()):
         download_and_extract_data(
             url=DATA_URL,
             target_dir=RAW_DATA_DIR,
         )
     
+    images, targets = load_images(RAW_DATA_DIR)
+    split_data(images, targets)
+    preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)
     train_set, _ = create_datasets(str(PROCESSED_DATA_DIR))
     train_dataloader = torch.utils.data.DataLoader(train_set, cfg.experiments.batch_size, shuffle=True)
-
+    print("DATA SETUP COMPLETE")
+    # TRAINING SETUP
     model = Model(num_classes=2).to(DEVICE)
     optimizer = hydra.utils.instantiate(cfg.optimizer, params=model.parameters())
     loss_fn = torch.nn.CrossEntropyLoss()
@@ -83,6 +88,7 @@ def train(cfg: DictConfig) -> None:
     statistics: Dict[str, List[float]] = {"train_loss": [], "train_accuracy": []}
     prof.start()
 
+    # ACTUAL TRAINING
     for epoch in range(cfg.experiments.epochs):
         model.train()
         epoch_loss = 0.0
@@ -134,6 +140,7 @@ def train(cfg: DictConfig) -> None:
     prof.stop()
     print("Training complete")
 
+    #TRAINING FINISHED
     try:
         print("\n=== Profiling Summary ===")
         print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
