@@ -7,6 +7,8 @@ from sklearn.model_selection import train_test_split
 import requests
 import tarfile
 
+DATA_URL= "https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/resolve/main/apple_data.tar.gz"
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
@@ -24,12 +26,10 @@ class_map = {
     "Apple__Rotten": 1,
 }
 
-
+"""
 def download_and_extract_data(
-    url: str, target_dir: str, archive_name: str = "apple_data.tar.gz", remove_archive: bool = True
+    url: str, target_dir: str, archive_name: str = "training-data.tar.gz", remove_archive: bool = True
 ):
-    """Download a tar.gz archive and extract it to target_dir."""
-
     os.makedirs(target_dir, exist_ok=True)
     archive_path = os.path.join(target_dir, archive_name)
 
@@ -49,6 +49,21 @@ def download_and_extract_data(
         os.remove(archive_path)
 
     print("Dataset ready at:", target_dir)
+"""
+def download_and_extract_data(url: str, target_dir: str):
+    """Download and extract a tar.gz on the fly using system pipes."""
+    os.makedirs(target_dir, exist_ok=True)
+    print(f"Streaming dataset from {url}...")
+    
+    # The -L follows redirects (needed for Hugging Face)
+    # The -xz unzips and extracts
+    # The -C changes to the target directory before unpacking
+    cmd = f"curl -L {url} | tar -xz -C {target_dir}"
+    exit_code = os.system(cmd)
+    if exit_code == 0:
+        print(f"Success! Data extracted to {target_dir}")
+    else:
+        print("Failed to download or extract")
 
 
 def pil_to_tensor_grayscale(img: Image.Image, size: tuple[int, int] = (32, 32)) -> torch.Tensor:

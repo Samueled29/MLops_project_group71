@@ -51,10 +51,10 @@ def train(cfg: DictConfig) -> None:
         name=cfg.wandb.run_name,
         reinit=True,
     )
-    
+
     if not RAW_DATA_DIR.exists() or not any(RAW_DATA_DIR.iterdir()):
         download_and_extract_data(
-            url="https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/resolve/main/apple_data.tar.gz",
+            url=DATA_URL,
             target_dir=RAW_DATA_DIR,
         )
     
