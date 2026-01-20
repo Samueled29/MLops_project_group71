@@ -1,0 +1,31 @@
+program: src/fruit_and_vegetable_disease/train.py
+command:
+  - ${env}
+  - uv
+  - run
+  - python
+  - ${program}
+  - ${args_no_hyphen}
+method: bayes
+metric:
+  name: train/epoch_loss
+  goal: minimize
+parameters:
+  experiments.lr:
+    distribution: log_uniform_values
+    min: 0.00001
+    max: 0.001
+  experiments.batch_size:
+    values: [16, 32, 64]
+  optimizer.weight_decay:
+    values: [0.0, 0.001, 0.01]
+  experiments.epochs:
+    values: [4, 6]
+  wandb.run_name:
+    value: sweep-run
+  wandb.tags:
+    values:
+      - sweep
+      - vit
+      - apple
+run_cap: 12
