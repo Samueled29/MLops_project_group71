@@ -2,10 +2,10 @@
 import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
-from typing import Dict, List
-
 import hydra
 import wandb
+
+from typing import Dict, List
 from omegaconf import DictConfig, OmegaConf
 from torch.profiler import (
     ProfilerActivity,
@@ -20,20 +20,6 @@ from fruit_and_vegetable_disease.model import Model
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
 
-def resize_and_expand_channels(images: torch.Tensor) -> torch.Tensor:
-    """Resize 32x32 grayscale to 224x224 RGB required by Vision Transformer.
-
-    Args:
-        images: Batch of images with shape (B, C, H, W).
-
-    Returns:
-        Resized RGB images with shape (B, 3, 224, 224).
-    """
-    resized = F.interpolate(images, size=(224, 224), mode="bilinear", align_corners=False)
-    rgb = resized.repeat(1, 3, 1, 1)
-    return rgb
-
-
 @hydra.main(version_base="1.3", config_path="../../configs", config_name="config")
 def train(cfg: DictConfig) -> None:
     """Train a model on fruit and vegetable disease dataset.
@@ -41,6 +27,7 @@ def train(cfg: DictConfig) -> None:
     Args:
         cfg: Hydra config.
     """
+    # INIT
     print(OmegaConf.to_yaml(cfg))
     torch.manual_seed(cfg.seed)
 
@@ -52,19 +39,22 @@ def train(cfg: DictConfig) -> None:
         reinit=True,
     )
 
-    # DATA DOWNLOADING AND DATASET CREATION
+    # DATA DOWNLOADING, DATA PREPROCESSING AND DATASET CREATION
     if not RAW_DATA_DIR.exists() or not any(RAW_DATA_DIR.iterdir()):
         download_and_extract_data(
             url=DATA_URL,
             target_dir=RAW_DATA_DIR,
         )
     
-    images, targets = load_images(RAW_DATA_DIR)
-    split_data(images, targets)
-    preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)
+    if not os.path.exists(PROCESSED_DATA_DIR) or not os.listdir(PROCESSED_DATA_DIR):
+        images, targets = load_images(RAW_DATA_DIR)
+        split_data(images, targets)
+        preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)
+
     train_set, _ = create_datasets(str(PROCESSED_DATA_DIR))
     train_dataloader = torch.utils.data.DataLoader(train_set, cfg.experiments.batch_size, shuffle=True)
     print("DATA SETUP COMPLETE")
+
     # TRAINING SETUP
     model = Model(num_classes=2).to(DEVICE)
     optimizer = hydra.utils.instantiate(cfg.optimizer, params=model.parameters())
@@ -98,7 +88,7 @@ def train(cfg: DictConfig) -> None:
         for i, (img, target) in enumerate(train_dataloader):
             img, target = img.to(DEVICE), target.to(DEVICE)
             optimizer.zero_grad()
-            y_pred = model(resize_and_expand_channels(img))
+            y_pred = model(img)
             loss = loss_fn(y_pred, target)
             loss.backward()
             optimizer.step()
