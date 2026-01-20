@@ -34,8 +34,8 @@ def download_and_extract_data(
 ):
     """Download and extract a tar.gz on the fly using system pipes."""
     os.makedirs(target_dir, exist_ok=True)
-
     archive_path = os.path.join(target_dir, archive_name)
+
     print(f"Downloading raw data from {url}...")
     download_cmd = f"curl -sSL {url} -o {archive_path}"
     download_exit_code = os.system(download_cmd)
@@ -48,7 +48,7 @@ def download_and_extract_data(
     extract_exit_code = os.system(extract_cmd)
 
     if extract_exit_code == 0:
-        print(f"Raw data correctly extracted extracted in {target_dir}")
+        print(f"Raw data correctly extracted in {target_dir}")
         if remove_archive and os.path.exists(archive_path):
             os.remove(archive_path)
     else:
