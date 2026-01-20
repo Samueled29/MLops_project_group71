@@ -1,8 +1,9 @@
-# ...existing code...
 import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
 from typing import Dict, List
+from pathlib import Path
+import subprocess
 
 import hydra
 import wandb
@@ -14,10 +15,14 @@ from torch.profiler import (
     profile,
 )
 
-from fruit_and_vegetable_disease.data import PROCESSED_DATA_DIR, create_datasets
+from fruit_and_vegetable_disease.data import create_datasets
 from fruit_and_vegetable_disease.model import Model
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+
+# Paths
+PROCESSED_DATA_DIR = Path("data/processed")  # Local path to processed data
+BUCKET_PATH = "gs://fruit-and-veg-disease-data_bucket/processed"  # Cloud storage path
 
 
 def resize_and_expand_channels(images: torch.Tensor) -> torch.Tensor:
@@ -51,6 +56,12 @@ def train(cfg: DictConfig) -> None:
         name=cfg.wandb.run_name,
         reinit=True,
     )
+
+    # Download data from cloud storage if not present locally
+    if not PROCESSED_DATA_DIR.exists() or not any(PROCESSED_DATA_DIR.iterdir()):
+        PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
+        print(f"Downloading processed data from {BUCKET_PATH} to {PROCESSED_DATA_DIR}...")
+        subprocess.run(["gsutil", "-m", "cp", "-r", f"{BUCKET_PATH}/*", str(PROCESSED_DATA_DIR)], check=True)
 
     train_set, _ = create_datasets(str(PROCESSED_DATA_DIR))
     train_dataloader = torch.utils.data.DataLoader(train_set, cfg.experiments.batch_size, shuffle=True)
@@ -136,6 +147,10 @@ def train(cfg: DictConfig) -> None:
             print(prof.key_averages().table(sort_by="self_cuda_memory_usage", row_limit=10))
     except Exception:
         pass
+
+    # Create directories if they don't exist
+    Path("reports/figures").mkdir(parents=True, exist_ok=True)
+    Path("models").mkdir(parents=True, exist_ok=True)
 
     torch.save(model.state_dict(), "models/model.pth")
 
