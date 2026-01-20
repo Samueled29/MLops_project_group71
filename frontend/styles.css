@@ -1,0 +1,107 @@
+:root {
+  --bg: #0b0f1a;
+  --card: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.14);
+  --text: rgba(255,255,255,0.92);
+  --muted: rgba(255,255,255,0.62);
+  --ok: rgba(46, 204, 113, 1);
+  --bad: rgba(255, 107, 107, 1);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}
+
+.wrap { width: 100%; max-width: 720px; }
+h1 { margin: 0 0 8px; font-size: 28px; }
+.sub { margin: 0 0 16px; color: var(--muted); }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+input[type="file"] {
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+}
+
+button {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.10);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.preview {
+  margin-top: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+  padding: 12px;
+  min-height: 240px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.preview img {
+  max-width: 100%;
+  max-height: 420px;
+  border-radius: 12px;
+}
+
+.placeholder { color: var(--muted); }
+
+.result {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+  display: grid;
+  gap: 6px;
+}
+
+.pred {
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.pred.ok { color: var(--ok); }
+.pred.bad { color: var(--bad); }
+
+.error {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,107,107,0.4);
+  background: rgba(255,107,107,0.12);
+}
+
+.hidden { display: none !important; }
+

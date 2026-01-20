@@ -21,3 +21,7 @@ plugins:
 
 nav:
   - Home: index.md
+  - Profiling: 
+      - Quickstart: profiling-quickstart.md
+      - Detailed: profiling.md
+  - Cloud build: cloudbuild.md

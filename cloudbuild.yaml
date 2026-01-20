@@ -1,0 +1,29 @@
+substitutions:
+  _REGION: europe-west1
+  _REGISTRY: ml
+  _IMAGE: fruit-train
+  _DOCKERFILE: dockerfiles/train.dockerfile
+
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    id: "Build container image"
+    args:
+      [
+        "build",
+        ".",
+        "-f",
+        "${_DOCKERFILE}",
+        "-t",
+        "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REGISTRY}/${_IMAGE}:latest"
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    id: "Push container image"
+    args:
+      [
+        "push",
+        "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REGISTRY}/${_IMAGE}:latest"
+      ]
+
+options:
+  logging: CLOUD_LOGGING_ONLY

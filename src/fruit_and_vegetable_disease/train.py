@@ -2,23 +2,38 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
 from typing import Dict, List
+from pathlib import Path
+import subprocess
 
 import hydra
 import wandb
 from omegaconf import DictConfig, OmegaConf
-from torch.profiler import profile, ProfilerActivity, schedule, tensorboard_trace_handler
+from torch.profiler import (
+    ProfilerActivity,
+    schedule,
+    tensorboard_trace_handler,
+    profile,
+)
 
-from fruit_and_vegetable_disease.data import PROCESSED_DATA_DIR, create_datasets
-
-# from transformers import ViTForImageClassification, ViTImageProcessor
+from fruit_and_vegetable_disease.data import create_datasets
 from fruit_and_vegetable_disease.model import Model
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
+# Paths
+PROCESSED_DATA_DIR = Path("data/processed")  # Local path to processed data
+BUCKET_PATH = "gs://fruit-and-veg-disease-data_bucket/processed"  # Cloud storage path
+
 
 def resize_and_expand_channels(images: torch.Tensor) -> torch.Tensor:
-    """Resize 32x32 grayscale to 224x224 RGB required by Vision Transformer."""
+    """Resize 32x32 grayscale to 224x224 RGB required by Vision Transformer.
 
+    Args:
+        images: Batch of images with shape (B, C, H, W).
+
+    Returns:
+        Resized RGB images with shape (B, 3, 224, 224).
+    """
     resized = F.interpolate(images, size=(224, 224), mode="bilinear", align_corners=False)
     rgb = resized.repeat(1, 3, 1, 1)
     return rgb
@@ -26,7 +41,11 @@ def resize_and_expand_channels(images: torch.Tensor) -> torch.Tensor:
 
 @hydra.main(version_base="1.3", config_path="../../configs", config_name="config")
 def train(cfg: DictConfig) -> None:
-    """Train a model on fruit and vegetable disease dataset."""
+    """Train a model on fruit and vegetable disease dataset.
+
+    Args:
+        cfg: Hydra config.
+    """
     print(OmegaConf.to_yaml(cfg))
     torch.manual_seed(cfg.seed)
 
@@ -37,6 +56,12 @@ def train(cfg: DictConfig) -> None:
         name=cfg.wandb.run_name,
         reinit=True,
     )
+
+    # Download data from cloud storage if not present locally
+    if not PROCESSED_DATA_DIR.exists() or not any(PROCESSED_DATA_DIR.iterdir()):
+        PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
+        print(f"Downloading processed data from {BUCKET_PATH} to {PROCESSED_DATA_DIR}...")
+        subprocess.run(["gsutil", "-m", "cp", "-r", f"{BUCKET_PATH}/*", str(PROCESSED_DATA_DIR)], check=True)
 
     train_set, _ = create_datasets(str(PROCESSED_DATA_DIR))
     train_dataloader = torch.utils.data.DataLoader(train_set, cfg.experiments.batch_size, shuffle=True)
@@ -57,7 +82,7 @@ def train(cfg: DictConfig) -> None:
         on_trace_ready=tensorboard_trace_handler("./logs/profiler"),
         record_shapes=True,
         profile_memory=True,
-        with_stack=False,  # Disable stack traces to save memory
+        with_stack=False,
     )
 
     statistics: Dict[str, List[float]] = {"train_loss": [], "train_accuracy": []}
@@ -99,8 +124,8 @@ def train(cfg: DictConfig) -> None:
 
             prof.step()
 
-        avg_epoch_loss = epoch_loss / num_batches
-        avg_epoch_accuracy = epoch_accuracy / num_batches
+        avg_epoch_loss = epoch_loss / num_batches if num_batches else 0.0
+        avg_epoch_accuracy = epoch_accuracy / num_batches if num_batches else 0.0
         print(f"Epoch {epoch} complete - Avg Loss: {avg_epoch_loss:.4f}, " f"Avg Accuracy: {avg_epoch_accuracy:.4f}")
 
         wandb.log(
@@ -114,14 +139,21 @@ def train(cfg: DictConfig) -> None:
     prof.stop()
     print("Training complete")
 
-    # Print profiling summary
-    print("\n=== Profiling Summary ===")
-    print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
-    if torch.cuda.is_available():
-        print("\n=== Memory Usage ===")
-        print(prof.key_averages().table(sort_by="self_cuda_memory_usage", row_limit=10))
+    try:
+        print("\n=== Profiling Summary ===")
+        print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
+        if torch.cuda.is_available():
+            print("\n=== Memory Usage ===")
+            print(prof.key_averages().table(sort_by="self_cuda_memory_usage", row_limit=10))
+    except Exception:
+        pass
+
+    # Create directories if they don't exist
+    Path("reports/figures").mkdir(parents=True, exist_ok=True)
+    Path("models").mkdir(parents=True, exist_ok=True)
 
     torch.save(model.state_dict(), "models/model.pth")
+
     fig, axs = plt.subplots(1, 2, figsize=(15, 5))
     axs[0].plot(statistics["train_loss"])
     axs[0].set_title("Train loss")
@@ -131,7 +163,6 @@ def train(cfg: DictConfig) -> None:
 
     wandb.log({"training_statistics": wandb.Image("reports/figures/training_statistics.png")})
 
-    # minimal usage / sanity checks
     print(f"Dataset size: {len(train_set)}")
     print(f"Model: {model.__class__.__name__}")
 
