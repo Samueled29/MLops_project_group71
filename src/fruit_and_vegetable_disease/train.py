@@ -21,8 +21,8 @@ from fruit_and_vegetable_disease.model import Model
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
 # Paths
-PROCESSED_DATA_DIR = Path("data/processed") # Local path to processed data
-BUCKET_PATH = "gs://fruit-and-veg-disease-data_bucket/processed" # Cloud storage path
+PROCESSED_DATA_DIR = Path("data/processed")  # Local path to processed data
+BUCKET_PATH = "gs://fruit-and-veg-disease-data_bucket/processed"  # Cloud storage path
 
 
 def resize_and_expand_channels(images: torch.Tensor) -> torch.Tensor:

@@ -13,6 +13,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 PROCESSED_DATA_DIR = Path("data/processed")
 BUCKET_PATH = "gs://fruit-and-veg-disease-data_bucket/processed"
 
+
 def evaluate(model_checkpoint: str, batch_size: int = 32) -> None:
     """Evaluate the model."""
     print(f"Evaluating model: {model_checkpoint}")
@@ -25,10 +26,7 @@ def evaluate(model_checkpoint: str, batch_size: int = 32) -> None:
     if not PROCESSED_DATA_DIR.exists() or not any(PROCESSED_DATA_DIR.iterdir()):
         PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
         print(f"Downloading processed data from {BUCKET_PATH} to {PROCESSED_DATA_DIR}...")
-        subprocess.run(
-            ["gsutil", "-m", "cp", "-r", f"{BUCKET_PATH}/*", str(PROCESSED_DATA_DIR)],
-            check=True
-        )
+        subprocess.run(["gsutil", "-m", "cp", "-r", f"{BUCKET_PATH}/*", str(PROCESSED_DATA_DIR)], check=True)
     _, test_set = create_datasets(str(PROCESSED_DATA_DIR))
     test_dataloader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False)
 
