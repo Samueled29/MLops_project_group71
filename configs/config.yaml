@@ -1,6 +1,6 @@
 defaults:
   - dataset: apple
-  - model: vit_tiny
+  - model: vit_base
   - optimizer: adam
   - experiments: base
   - _self_
