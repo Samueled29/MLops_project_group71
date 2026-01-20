@@ -86,7 +86,6 @@ def train(cfg: DictConfig) -> None:
         num_batches = 0
 
         for i, (img, target) in enumerate(train_dataloader):
-            print(f"DEBUG: img shape is {img.shape}")
             img, target = img.to(DEVICE), target.to(DEVICE)
             optimizer.zero_grad()
             y_pred = model(img)

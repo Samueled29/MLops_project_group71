@@ -113,8 +113,6 @@ def preprocess_data(raw_dir: str, processed_dir: str) -> None:
     test_images: torch.Tensor = torch.load(f"{raw_dir}/test_images.pt")
     test_target: torch.Tensor = torch.load(f"{raw_dir}/test_target.pt")
 
-    #train_images = train_images.unsqueeze(1).float()
-    #test_images = test_images.unsqueeze(1).float()
     train_target = train_target.long()
     test_target = test_target.long()
 
