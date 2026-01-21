@@ -1,12 +1,10 @@
 import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
-from typing import Dict, List
-from pathlib import Path
-import subprocess
-
 import hydra
 import wandb
+
+from typing import Dict, List
 from omegaconf import DictConfig, OmegaConf
 from torch.profiler import (
     ProfilerActivity,
@@ -15,7 +13,7 @@ from torch.profiler import (
     profile,
 )
 
-from fruit_and_vegetable_disease.data import create_datasets
+from fruit_and_vegetable_disease.data import *
 from fruit_and_vegetable_disease.model import Model
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
@@ -25,20 +23,6 @@ PROCESSED_DATA_DIR = Path("data/processed")  # Local path to processed data
 BUCKET_PATH = "gs://fruit-and-veg-disease-data_bucket/processed"  # Cloud storage path
 
 
-def resize_and_expand_channels(images: torch.Tensor) -> torch.Tensor:
-    """Resize 32x32 grayscale to 224x224 RGB required by Vision Transformer.
-
-    Args:
-        images: Batch of images with shape (B, C, H, W).
-
-    Returns:
-        Resized RGB images with shape (B, 3, 224, 224).
-    """
-    resized = F.interpolate(images, size=(224, 224), mode="bilinear", align_corners=False)
-    rgb = resized.repeat(1, 3, 1, 1)
-    return rgb
-
-
 @hydra.main(version_base="1.3", config_path="../../configs", config_name="config")
 def train(cfg: DictConfig) -> None:
     """Train a model on fruit and vegetable disease dataset.
@@ -46,6 +30,7 @@ def train(cfg: DictConfig) -> None:
     Args:
         cfg: Hydra config.
     """
+    # INIT
     print(OmegaConf.to_yaml(cfg))
     torch.manual_seed(cfg.seed)
 
@@ -57,15 +42,23 @@ def train(cfg: DictConfig) -> None:
         reinit=True,
     )
 
-    # Download data from cloud storage if not present locally
-    if not PROCESSED_DATA_DIR.exists() or not any(PROCESSED_DATA_DIR.iterdir()):
-        PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
-        print(f"Downloading processed data from {BUCKET_PATH} to {PROCESSED_DATA_DIR}...")
-        subprocess.run(["gsutil", "-m", "cp", "-r", f"{BUCKET_PATH}/*", str(PROCESSED_DATA_DIR)], check=True)
+    # DATA DOWNLOADING, DATA PREPROCESSING AND DATASET CREATION
+    if not RAW_DATA_DIR.exists() or not any(RAW_DATA_DIR.iterdir()):
+        download_and_extract_data(
+            url=DATA_URL,
+            target_dir=RAW_DATA_DIR,
+        )
+    
+    if not os.path.exists(PROCESSED_DATA_DIR) or not os.listdir(PROCESSED_DATA_DIR):
+        images, targets = load_images(RAW_DATA_DIR)
+        split_data(images, targets)
+        preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)
 
     train_set, _ = create_datasets(str(PROCESSED_DATA_DIR))
     train_dataloader = torch.utils.data.DataLoader(train_set, cfg.experiments.batch_size, shuffle=True)
+    print("DATA SETUP COMPLETE")
 
+    # TRAINING SETUP
     model = Model(num_classes=2).to(DEVICE)
     optimizer = hydra.utils.instantiate(cfg.optimizer, params=model.parameters())
     loss_fn = torch.nn.CrossEntropyLoss()
@@ -88,6 +81,7 @@ def train(cfg: DictConfig) -> None:
     statistics: Dict[str, List[float]] = {"train_loss": [], "train_accuracy": []}
     prof.start()
 
+    # ACTUAL TRAINING
     for epoch in range(cfg.experiments.epochs):
         model.train()
         epoch_loss = 0.0
@@ -97,7 +91,7 @@ def train(cfg: DictConfig) -> None:
         for i, (img, target) in enumerate(train_dataloader):
             img, target = img.to(DEVICE), target.to(DEVICE)
             optimizer.zero_grad()
-            y_pred = model(resize_and_expand_channels(img))
+            y_pred = model(img)
             loss = loss_fn(y_pred, target)
             loss.backward()
             optimizer.step()
@@ -139,6 +133,7 @@ def train(cfg: DictConfig) -> None:
     prof.stop()
     print("Training complete")
 
+    #TRAINING FINISHED
     try:
         print("\n=== Profiling Summary ===")
         print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
