@@ -8,12 +8,6 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 PROCESSED_DATA_DIR = Path("data/processed")
 
 
-def resize_and_expand_channels(images: torch.Tensor) -> torch.Tensor:
-    """Resize images to 224x224 and expand from 1 channel to 3 channels."""
-    images = torch.nn.functional.interpolate(images, size=(224, 224), mode="bilinear", align_corners=False)
-    return images.repeat(1, 3, 1, 1)
-
-
 def benchmark_dataloader(batch_size: int = 32, num_workers: int = 0, num_batches: int = 50):
     """Benchmark data loading with different configurations.
     
@@ -51,7 +45,6 @@ def benchmark_dataloader(batch_size: int = 32, num_workers: int = 0, num_batches
         if i >= 5:
             break
         img, target = img.to(DEVICE), target.to(DEVICE)
-        img = resize_and_expand_channels(img)
         output = model(img)
     
     print("Running benchmark...")
@@ -73,7 +66,6 @@ def benchmark_dataloader(batch_size: int = 32, num_workers: int = 0, num_batches
         
         # Time model forward pass
         forward_start = time.time()
-        img = resize_and_expand_channels(img)
         output = model(img)
         loss = torch.nn.functional.cross_entropy(output, target)
         forward_end = time.time()
