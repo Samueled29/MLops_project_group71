@@ -181,7 +181,8 @@ cython_debug/
 .dvc/tmp/
 
 #data 
-/data/
+/data/*
+!/data/**/*.dvc
 
 #logs
 /outputs/
@@ -205,3 +206,5 @@ multirun/
 
 # Secrets and credentials
 keys/
+/Apple__Healthy.tar.gz
+/Apple__Rotten.tar.gz
