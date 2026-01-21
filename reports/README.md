@@ -248,7 +248,7 @@ The total coverage of our code is 49%, which does not cover all our source code 
 >
 > Answer:
 
-We made use of both branches and pull requests in our project. Each seperate functionality had its own branch, as believe this practice gives more flexbility than having one universal branch per every developer. To merge the code we opened pull requests, however usually we did not assign any approver and so we were closing the pull requests by ourselves. In this way, we were not really harnessing the advantages of using pull requests, which we are now aware of.
+We made use of both branches and pull requests in our project. Each seperate functionality had its own branch, as we believe this practice gives more flexbility than having one multi-purpose branch per every developer. To merge the code we opened pull requests, however usually we did not assign any approver and so we were closing the pull requests by ourselves. In this way, we were not really harnessing the advantages of using pull requests, which we are now aware of.
 
 ### Question 10
 
