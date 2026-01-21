@@ -3,3 +3,7 @@ outs:
   size: 527375189
   hash: md5
   path: Apple__Healthy.tar.gz
+  cloud:
+    remote_storage:
+      etag: 08aadb9ae6a39d92031001
+      version_id: '1769020739464618'

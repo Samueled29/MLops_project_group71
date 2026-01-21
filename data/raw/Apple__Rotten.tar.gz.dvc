@@ -3,3 +3,7 @@ outs:
   size: 579996359
   hash: md5
   path: Apple__Rotten.tar.gz
+  cloud:
+    remote_storage:
+      etag: 08dfd795f5a39d92031001
+      version_id: '1769020770839519'
