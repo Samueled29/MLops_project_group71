@@ -181,7 +181,8 @@ cython_debug/
 .dvc/tmp/
 
 #data 
-/data/*
+/data/**
+!/data/**/
 !/data/**/*.dvc
 
 #logs
