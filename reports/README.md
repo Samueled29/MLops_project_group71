@@ -199,7 +199,9 @@ From the cookiecutter template we have filled out the configs folder with .yaml 
 >
 > Answer:
 
-We used ruff in the project and set up github-actions workflow to check if the commits are passing ruff formatting. These concepts are important in larger projects, as standardized formatting, typing and code quality rules enable multiple developers with different practices and coding habits to collaborate on the same code. It prevents mistakes caused by inconsistent pieces of code and makes it easier to spot bugs in the synatx or logic. The documentation allows to easier understand code that was written by someone else or by yourself a longer time ago.
+To ensure consistent code quality, we use automated tools for linting, formatting, and static analysis. Specifically, we rely on Ruff, configured via pyproject.toml, to enforce a standardized code style and catch common issues early. These checks run automatically through pre-commit hooks, preventing non-compliant code from being committed. Additionally, a GitHub Actions workflow runs on every push and pull request to verify that the code passes formatting and test requirements, ensuring continuous compliance.
+
+These practices are especially important in larger projects where multiple developers collaborate. Standardized formatting, typing, and quality rules help bridge different coding habits, reduce mistakes caused by inconsistencies, and make it easier to identify syntax or logic bugs. They also improve the overall readability of the codebase, making it easier to understand code written by others or by yourself after some time.
 
 ## Version control
 
@@ -280,7 +282,65 @@ We made use of both branches and pull requests in our project. Each seperate fun
 >
 > Answer:
 
---- question 11 fill here ---
+Our CI is implemented with three separate **GitHub Actions** workflows under `.github/workflows`:
+- **Linting workflow**
+- **Unit testing workflow**
+- **Pre-commit autoupdate workflow**
+
+### Triggers
+- Linting and testing run automatically on **every push** and when changes are merged into **`main`**.
+- Pre-commit autoupdate runs on a **scheduled overnight cadence** to keep hooks/tools up to date.
+
+### Testing (portability & compatibility)
+- Unit tests run with **pytest** (with coverage reporting) across a matrix of:
+  - OS: **Ubuntu, Windows, macOS**
+  - Python: **3.12, 3.13**
+  - PyTorch: **2.5.1, 2.6.0**
+- This matrix surfaced **four failing cases on PyTorch 2.5.1**, demonstrating the value of CI for catching environment-specific issues early.
+
+### Dependency installation & caching
+Both linting and testing use `astral-sh/setup-uv@v7` with caching enabled:
+```yaml
+- uses: astral-sh/setup-uv@v7
+  with:
+    enable-cache: true
+````
+
+### Linting checks (Ruff)
+
+In the linting workflow we enforce both static analysis and formatting checks:
+
+```yaml
+- name: Ruff check
+  run: uv run ruff check . --output-format=github
+
+- name: Ruff format (check)
+  run: uv run ruff format --check .
+```
+
+### Pre-commit autoupdate (scheduled)
+
+The pre-commit update workflow is granted write permissions to open automated pull requests:
+
+```yaml
+permissions:
+  contents: write
+  pull-requests: write
+```
+
+It periodically updates hooks with:
+
+```yaml
+- name: Pre-commit autoupdate
+  run: uv run pre-commit autoupdate
+```
+
+### Reference
+
+* [GitHub Actions workflows](https://github.com/Samueled29/MLops_project_group71/tree/main/.github/workflows)
+
+
+
 
 ## Running code and tracking experiments
 
@@ -299,7 +359,21 @@ We made use of both branches and pull requests in our project. Each seperate fun
 >
 > Answer:
 
---- question 12 fill here ---
+
+Experiments are managed with **Hydra** using a modular set of YAML configuration files stored in `configs/`.
+
+- The main entrypoint (`train.py`) is annotated with `@hydra.main` and loads `config.yaml` as the root configuration.
+- `config.yaml` composes sub-configurations for:
+  - **dataset** selection
+  - **experiment** settings (e.g., batch size, epochs)
+  - **model** architecture
+  - **optimizer**
+
+### Example: override configs from the CLI
+Hydra allows changing experiments without editing code by overriding parameters at runtime:
+```bash
+python train.py experiments=exp_fast model=vit_tiny optimizer=adam
+```
 
 ### Question 13
 
@@ -314,7 +388,22 @@ We made use of both branches and pull requests in our project. Each seperate fun
 >
 > Answer:
 
---- question 13 fill here ---
+Reproducibility is ensured through **Hydra-based experiment management** and automatic configuration tracking.
+
+- Each run is defined by a composition of modular YAML configs specifying the **dataset**, **model architecture**, **optimizer**, and **training hyperparameters**.
+- On execution, Hydra creates a dedicated output folder (e.g., `outputs/apple/<timestamp>/`) containing a `.hydra/` directory.
+
+### What Hydra saves per run
+Inside `.hydra/`, Hydra stores:
+- `config.yaml`: the fully resolved configuration used for the run
+- `overrides.yaml`: all command-line overrides applied (e.g., `experiments=exp_fast`)
+- `hydra.yaml`: Hydra runtime settings
+
+This guarantees that the exact configuration (defaults + overrides) is preserved alongside outputs/logs, enabling experiments to be reproduced by rerunning training with the same stored settings.
+
+### Controlling randomness
+A **fixed random seed** is defined in the configuration and applied at runtime to reduce stochastic variation across runs.
+
 
 ### Question 14
 
@@ -452,7 +541,17 @@ We made use of both branches and pull requests in our project. Each seperate fun
 >
 > Answer:
 
---- question 23 fill here ---
+We implemented a **FastAPI** service to expose the trained model for inference.
+
+- The model is loaded **once at startup** using the FastAPI lifespan hook, with configurable `MODEL_PATH` and `DEVICE`, so weights are not reloaded on every request.
+- The main endpoint, `POST /predict`, accepts an uploaded image and applies the **same preprocessing as training** (resize, normalization, channel expansion) to ensure consistency between training and inference.
+- Inference runs under `torch.inference_mode()` and returns a JSON response containing:
+  - the predicted label (`healthy` or `rotten`)
+  - a confidence score (softmax probability)
+
+### Safety and monitoring
+- Basic validation is included (content-type, max upload size, corrupted images).
+- The API exposes `GET /health` and `GET /ready` for monitoring and readiness checks.
 
 ### Question 24
 
@@ -533,7 +632,12 @@ We made use of both branches and pull requests in our project. Each seperate fun
 >
 > Answer:
 
---- question 28 fill here ---
+We implemented a minimal **frontend** to provide an end-to-end demo for non-technical users.
+
+- Built with plain **HTML/CSS/JavaScript** (no framework).
+- Uploads an image and sends it to `POST /predict` using `fetch` + `FormData`.
+- Displays the returned **predicted label** and **confidence score** in the page UI.
+
 
 ### Question 29
 
