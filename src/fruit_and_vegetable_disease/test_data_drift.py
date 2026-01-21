@@ -1,4 +1,3 @@
-"""Generate detailed data drift HTML reports for human analysis and debugging."""
 from pathlib import Path
 import torch
 import pandas as pd

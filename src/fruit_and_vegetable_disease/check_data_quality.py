@@ -16,12 +16,14 @@ DRIFTED_DIR = PROJECT_ROOT / "data" / "drifted"
 
 
 def _ensure_nchw(x: torch.Tensor) -> torch.Tensor:
+	"""Ensure tensor is in NCHW format (batch, channels, height, width)."""
 	if x.dim() == 3:
 		return x.unsqueeze(1)
 	return x
 
 
 def _to_features_df(images: torch.Tensor, targets: torch.Tensor) -> pd.DataFrame:
+	"""Extract image features for drift detection."""
 	images = _ensure_nchw(images).float()
 	flat = images.view(images.size(0), -1)
 	df = pd.DataFrame(
@@ -35,9 +37,12 @@ def _to_features_df(images: torch.Tensor, targets: torch.Tensor) -> pd.DataFrame
 
 
 def main() -> None:
+	"""Load data and run data quality tests."""
+	print("Loading reference data...")
 	ref_images = torch.load(PROCESSED_DIR / "train_images.pt")
 	ref_targets = torch.load(PROCESSED_DIR / "train_target.pt")
 
+	print("Loading current data...")
 	cur_images = torch.load(DRIFTED_DIR / "drifted_test_images.pt")
 	cur_targets = torch.load(DRIFTED_DIR / "drifted_test_target.pt")
 
@@ -48,7 +53,7 @@ def main() -> None:
 	test_suite = TestSuite(
 		tests=[
 			TestNumberOfMissingValues(),
-			TestShareOfDriftedColumns(lt=0.5),  # Fail if >50% of features drifted
+			TestShareOfDriftedColumns(lt=0.5),
 		]
 	)
 	test_suite.run(reference_data=reference_data, current_data=current_data)
