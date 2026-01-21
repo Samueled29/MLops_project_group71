@@ -265,7 +265,7 @@ We made use of both branches and pull requests in our project. Each seperate fun
 >
 > Answer:
 
---- question 10 fill here ---
+Although we have implemented the DVC configuration, we had only one version of data throughout the whole development process, what did not allow us to use the proper functionality of the DVC setup. However, if the data files were preprocessed in multiple different ways or feature engineering was being performed in between training experiments, then DVC would become highly useful to keep track of the changes and make it easy to go back to the older versions.
 
 ### Question 11
 
@@ -467,7 +467,7 @@ A **fixed random seed** is defined in the configuration and applied at runtime t
 >
 > Answer:
 
---- question 17 fill here ---
+GCP Cloud Storage - enables creating buckets for storing data.
 
 ### Question 18
 
@@ -491,7 +491,7 @@ A **fixed random seed** is defined in the configuration and applied at runtime t
 >
 > Answer:
 
---- question 19 fill here ---
+![bucket](figures/bucket.png)
 
 ### Question 20
 
