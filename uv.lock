@@ -1229,6 +1229,7 @@ name = "fruit-and-vegetable-disease"
 version = "0.0.1"
 source = { editable = "." }
 dependencies = [
+    { name = "dvc" },
     { name = "dvc-gs" },
     { name = "evidently" },
     { name = "fastapi" },
@@ -1237,6 +1238,7 @@ dependencies = [
     { name = "hydra-core" },
     { name = "locust" },
     { name = "matplotlib" },
+    { name = "pathspec" },
     { name = "pillow" },
     { name = "pytest" },
     { name = "python-multipart" },
@@ -1267,6 +1269,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "dvc", extras = ["gcp"], specifier = ">=3.65.0" },
     { name = "dvc-gs", specifier = ">=3.0.2" },
     { name = "evidently", specifier = ">=0.7.20" },
     { name = "fastapi", specifier = "==0.115.6" },
@@ -1275,6 +1278,7 @@ requires-dist = [
     { name = "hydra-core", specifier = ">=1.3.2" },
     { name = "locust", specifier = ">=2.43.1" },
     { name = "matplotlib", specifier = ">=3.10.8" },
+    { name = "pathspec", specifier = "<0.12" },
     { name = "pillow", specifier = ">=12.1.0" },
     { name = "pytest", specifier = ">=8.3.4" },
     { name = "python-multipart", specifier = ">=0.0.21" },
@@ -2992,11 +2996,11 @@ parquet = [
 
 [[package]]
 name = "pathspec"
-version = "1.0.3"
+version = "0.11.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/4c/b2/bb8e495d5262bfec41ab5cb18f522f1012933347fb5d9e62452d446baca2/pathspec-1.0.3.tar.gz", hash = "sha256:bac5cf97ae2c2876e2d25ebb15078eb04d76e4b98921ee31c6f85ade8b59444d", size = 130841, upload-time = "2026-01-09T15:46:46.009Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a0/2a/bd167cdf116d4f3539caaa4c332752aac0b3a0cc0174cdb302ee68933e81/pathspec-0.11.2.tar.gz", hash = "sha256:e0d8d0ac2f12da61956eb2306b69f9469b42f4deb0f3cb6ed47b9cce9996ced3", size = 47032, upload-time = "2023-07-29T01:05:04.481Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/32/2b/121e912bd60eebd623f873fd090de0e84f322972ab25a7f9044c056804ed/pathspec-1.0.3-py3-none-any.whl", hash = "sha256:e80767021c1cc524aa3fb14bedda9c34406591343cc42797b386ce7b9354fb6c", size = 55021, upload-time = "2026-01-09T15:46:44.652Z" },
+    { url = "https://files.pythonhosted.org/packages/b4/2a/9b1be29146139ef459188f5e420a66e835dda921208db600b7037093891f/pathspec-0.11.2-py3-none-any.whl", hash = "sha256:1d6ed233af05e679efb96b1851550ea95bbb64b7c490b0f5aa52996c11e92a20", size = 29603, upload-time = "2023-07-29T01:05:02.656Z" },
 ]
 
 [[package]]

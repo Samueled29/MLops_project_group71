@@ -176,9 +176,14 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+#dvc
+.dvc/cache/
+.dvc/tmp/
 
 #data 
-/data/
+/data/**
+!/data/**/
+!/data/**/*.dvc
 
 #logs
 /outputs/
@@ -202,3 +207,5 @@ multirun/
 
 # Secrets and credentials
 keys/
+/Apple__Healthy.tar.gz
+/Apple__Rotten.tar.gz
