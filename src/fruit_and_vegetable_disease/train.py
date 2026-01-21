@@ -1,4 +1,3 @@
-# ...existing code...
 import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
@@ -18,6 +17,10 @@ from fruit_and_vegetable_disease.data import *
 from fruit_and_vegetable_disease.model import Model
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+
+# Paths
+PROCESSED_DATA_DIR = Path("data/processed")  # Local path to processed data
+BUCKET_PATH = "gs://fruit-and-veg-disease-data_bucket/processed"  # Cloud storage path
 
 
 @hydra.main(version_base="1.3", config_path="../../configs", config_name="config")
@@ -139,6 +142,10 @@ def train(cfg: DictConfig) -> None:
             print(prof.key_averages().table(sort_by="self_cuda_memory_usage", row_limit=10))
     except Exception:
         pass
+
+    # Create directories if they don't exist
+    Path("reports/figures").mkdir(parents=True, exist_ok=True)
+    Path("models").mkdir(parents=True, exist_ok=True)
 
     torch.save(model.state_dict(), "models/model.pth")
 
