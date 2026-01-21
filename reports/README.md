@@ -52,48 +52,48 @@ will check the repositories and the code to verify your answers.
 
 ### Week 1
 
-* [ ] Create a git repository (M5)
-* [ ] Make sure that all team members have write access to the GitHub repository (M5)
-* [ ] Create a dedicated environment for you project to keep track of your packages (M2)
-* [ ] Create the initial file structure using cookiecutter with an appropriate template (M6)
-* [ ] Fill out the `data.py` file such that it downloads whatever data you need and preprocesses it (if necessary) (M6)
-* [ ] Add a model to `model.py` and a training procedure to `train.py` and get that running (M6)
-* [ ] Remember to either fill out the `requirements.txt`/`requirements_dev.txt` files or keeping your
+* [x] Create a git repository (M5)
+* [x] Make sure that all team members have write access to the GitHub repository (M5)
+* [x] Create a dedicated environment for you project to keep track of your packages (M2)
+* [x] Create the initial file structure using cookiecutter with an appropriate template (M6)
+* [x] Fill out the `data.py` file such that it downloads whatever data you need and preprocesses it (if necessary) (M6)
+* [x] Add a model to `model.py` and a training procedure to `train.py` and get that running (M6)
+* [x] Remember to either fill out the `requirements.txt`/`requirements_dev.txt` files or keeping your
     `pyproject.toml`/`uv.lock` up-to-date with whatever dependencies that you are using (M2+M6)
-* [ ] Remember to comply with good coding practices (`pep8`) while doing the project (M7)
+* [x] Remember to comply with good coding practices (`pep8`) while doing the project (M7)
 * [ ] Do a bit of code typing and remember to document essential parts of your code (M7)
 * [ ] Setup version control for your data or part of your data (M8)
 * [ ] Add command line interfaces and project commands to your code where it makes sense (M9)
-* [ ] Construct one or multiple docker files for your code (M10)
-* [ ] Build the docker files locally and make sure they work as intended (M10)
-* [ ] Write one or multiple configurations files for your experiments (M11)
-* [ ] Used Hydra to load the configurations and manage your hyperparameters (M11)
-* [ ] Use profiling to optimize your code (M12)
-* [ ] Use logging to log important events in your code (M14)
-* [ ] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14)
-* [ ] Consider running a hyperparameter optimization sweep (M14)
+* [x] Construct one or multiple docker files for your code (M10)
+* [x] Build the docker files locally and make sure they work as intended (M10)
+* [x] Write one or multiple configurations files for your experiments (M11)
+* [x] Used Hydra to load the configurations and manage your hyperparameters (M11)
+* [x] Use profiling to optimize your code (M12)
+* [x] Use logging to log important events in your code (M14)
+* [x] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14)
+* [x] Consider running a hyperparameter optimization sweep (M14)
 * [ ] Use PyTorch-lightning (if applicable) to reduce the amount of boilerplate in your code (M15)
 
 ### Week 2
 
-* [ ] Write unit tests related to the data part of your code (M16)
-* [ ] Write unit tests related to model construction and or model training (M16)
-* [ ] Calculate the code coverage (M16)
-* [ ] Get some continuous integration running on the GitHub repository (M17)
-* [ ] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
-* [ ] Add a linting step to your continuous integration (M17)
-* [ ] Add pre-commit hooks to your version control setup (M18)
+* [x] Write unit tests related to the data part of your code (M16)
+* [x] Write unit tests related to model construction and or model training (M16)
+* [x] Calculate the code coverage (M16)
+* [x] Get some continuous integration running on the GitHub repository (M17)
+* [x] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
+* [x] Add a linting step to your continuous integration (M17)
+* [x] Add pre-commit hooks to your version control setup (M18)
 * [ ] Add a continues workflow that triggers when data changes (M19)
 * [ ] Add a continues workflow that triggers when changes to the model registry is made (M19)
-* [ ] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
-* [ ] Create a trigger workflow for automatically building your docker images (M21)
-* [ ] Get your model training in GCP using either the Engine or Vertex AI (M21)
-* [ ] Create a FastAPI application that can do inference using your model (M22)
+* [x] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
+* [x] Create a trigger workflow for automatically building your docker images (M21)
+* [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
+* [x] Create a FastAPI application that can do inference using your model (M22)
 * [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
-* [ ] Write API tests for your application and setup continues integration for these (M24)
-* [ ] Load test your application (M24)
+* [x] Write API tests for your application and setup continues integration for these (M24)
+* [x] Load test your application (M24)
 * [ ] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
-* [ ] Create a frontend for your API (M26)
+* [x] Create a frontend for your API (M26)
 
 ### Week 3
 
@@ -123,7 +123,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 1 fill here ---
+71
 
 ### Question 2
 > **Enter the study number for each member in the group**
@@ -134,7 +134,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 2 fill here ---
+s242916
 
 ### Question 3
 > **Did you end up using any open-source frameworks/packages not covered in the course during your project? If so**
@@ -148,7 +148,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 3 fill here ---
+In the model, we used a ViT transformer from Transformers - hugging face open-source library. It allowed us to focus more on the machine learning operations, rather than working on creating our own model code. This solution is also well-suited for the goal of our project, which is a binary classification of apples based on their images.
 
 ## Coding environment
 
@@ -168,7 +168,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 4 fill here ---
+We used uv for managing our dependencies and a cookiecutter template for the project structure, that comes with a few initial dependencies. The dependencies and general project requirements are defined in the file pyproject.toml and the file uv.lock stores the exact versions of the dependencies to reproduce exactly the same environment. Throughout the development process the dependencies were added using uv add command. To get a complete copy of our development environment, one would have to run the following commands: git clone 'github-url' and uv sync inside the project root, assuming that git and uv are already installed on the machine.
 
 ### Question 5
 
@@ -184,7 +184,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 5 fill here ---
+From the cookiecutter template we have filled out the configs folder with .yaml configuration files for training the model with two sets of hyperparameters and for using two versions of the ViT model, the src folder for the the source code - we implemented all the files apart from visualize.py and the tests folder where we implemented api testing and unit tests for the source code. In our source code we create a structure of data directories for storing the raw and the preprocessed files. Also the files pyproject.toml and uv.lock were continously updated.
 
 ### Question 6
 
@@ -199,7 +199,9 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 6 fill here ---
+To ensure consistent code quality, we use automated tools for linting, formatting, and static analysis. Specifically, we rely on Ruff, configured via pyproject.toml, to enforce a standardized code style and catch common issues early. These checks run automatically through pre-commit hooks, preventing non-compliant code from being committed. Additionally, a GitHub Actions workflow runs on every push and pull request to verify that the code passes formatting and test requirements, ensuring continuous compliance.
+
+These practices are especially important in larger projects where multiple developers collaborate. Standardized formatting, typing, and quality rules help bridge different coding habits, reduce mistakes caused by inconsistencies, and make it easier to identify syntax or logic bugs. They also improve the overall readability of the codebase, making it easier to understand code written by others or by yourself after some time.
 
 ## Version control
 
@@ -218,7 +220,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 7 fill here ---
+We have implemented 23 tests that test the source code located in the src folder. The file test_data.py checks if the the download of the files works correctly and if the proper directories are created. It also checks if the images and labels have correct properties, and if data splitting and normalizing create a desired output. The test_model.py checks if the model output has correct type and shape and the test_train.py checks the properties of input and output of the training process as well as the resizing of the images and the accuracy calculation.
 
 ### Question 8
 
@@ -233,7 +235,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 8 fill here ---
+The total coverage of our code is 49%, which does not cover all our source code (no tests for evaluate.py). We are far from 100% coverage of our code and even if we were then it does not mean the code is bug free. Some not obvious test cases could be missed and lead to errors.
 
 ### Question 9
 
@@ -248,7 +250,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 9 fill here ---
+We made use of both branches and pull requests in our project. Each seperate functionality had its own branch, as we believe this practice gives more flexbility than having one multi-purpose branch per every developer. To merge the code we opened pull requests, however usually we did not assign any approver and so we were closing the pull requests by ourselves. In this way, we were not really harnessing the advantages of using pull requests, which we are now aware of.
 
 ### Question 10
 
@@ -280,7 +282,65 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 11 fill here ---
+Our CI is implemented with three separate **GitHub Actions** workflows under `.github/workflows`:
+- **Linting workflow**
+- **Unit testing workflow**
+- **Pre-commit autoupdate workflow**
+
+### Triggers
+- Linting and testing run automatically on **every push** and when changes are merged into **`main`**.
+- Pre-commit autoupdate runs on a **scheduled overnight cadence** to keep hooks/tools up to date.
+
+### Testing (portability & compatibility)
+- Unit tests run with **pytest** (with coverage reporting) across a matrix of:
+  - OS: **Ubuntu, Windows, macOS**
+  - Python: **3.12, 3.13**
+  - PyTorch: **2.5.1, 2.6.0**
+- This matrix surfaced **four failing cases on PyTorch 2.5.1**, demonstrating the value of CI for catching environment-specific issues early.
+
+### Dependency installation & caching
+Both linting and testing use `astral-sh/setup-uv@v7` with caching enabled:
+```yaml
+- uses: astral-sh/setup-uv@v7
+  with:
+    enable-cache: true
+````
+
+### Linting checks (Ruff)
+
+In the linting workflow we enforce both static analysis and formatting checks:
+
+```yaml
+- name: Ruff check
+  run: uv run ruff check . --output-format=github
+
+- name: Ruff format (check)
+  run: uv run ruff format --check .
+```
+
+### Pre-commit autoupdate (scheduled)
+
+The pre-commit update workflow is granted write permissions to open automated pull requests:
+
+```yaml
+permissions:
+  contents: write
+  pull-requests: write
+```
+
+It periodically updates hooks with:
+
+```yaml
+- name: Pre-commit autoupdate
+  run: uv run pre-commit autoupdate
+```
+
+### Reference
+
+* [GitHub Actions workflows](https://github.com/Samueled29/MLops_project_group71/tree/main/.github/workflows)
+
+
+
 
 ## Running code and tracking experiments
 
@@ -299,7 +359,21 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 12 fill here ---
+
+Experiments are managed with **Hydra** using a modular set of YAML configuration files stored in `configs/`.
+
+- The main entrypoint (`train.py`) is annotated with `@hydra.main` and loads `config.yaml` as the root configuration.
+- `config.yaml` composes sub-configurations for:
+  - **dataset** selection
+  - **experiment** settings (e.g., batch size, epochs)
+  - **model** architecture
+  - **optimizer**
+
+### Example: override configs from the CLI
+Hydra allows changing experiments without editing code by overriding parameters at runtime:
+```bash
+python train.py experiments=exp_fast model=vit_tiny optimizer=adam
+```
 
 ### Question 13
 
@@ -314,7 +388,22 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 13 fill here ---
+Reproducibility is ensured through **Hydra-based experiment management** and automatic configuration tracking.
+
+- Each run is defined by a composition of modular YAML configs specifying the **dataset**, **model architecture**, **optimizer**, and **training hyperparameters**.
+- On execution, Hydra creates a dedicated output folder (e.g., `outputs/apple/<timestamp>/`) containing a `.hydra/` directory.
+
+### What Hydra saves per run
+Inside `.hydra/`, Hydra stores:
+- `config.yaml`: the fully resolved configuration used for the run
+- `overrides.yaml`: all command-line overrides applied (e.g., `experiments=exp_fast`)
+- `hydra.yaml`: Hydra runtime settings
+
+This guarantees that the exact configuration (defaults + overrides) is preserved alongside outputs/logs, enabling experiments to be reproduced by rerunning training with the same stored settings.
+
+### Controlling randomness
+A **fixed random seed** is defined in the configuration and applied at runtime to reduce stochastic variation across runs.
+
 
 ### Question 14
 
@@ -452,7 +541,17 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 23 fill here ---
+We implemented a **FastAPI** service to expose the trained model for inference.
+
+- The model is loaded **once at startup** using the FastAPI lifespan hook, with configurable `MODEL_PATH` and `DEVICE`, so weights are not reloaded on every request.
+- The main endpoint, `POST /predict`, accepts an uploaded image and applies the **same preprocessing as training** (resize, normalization, channel expansion) to ensure consistency between training and inference.
+- Inference runs under `torch.inference_mode()` and returns a JSON response containing:
+  - the predicted label (`healthy` or `rotten`)
+  - a confidence score (softmax probability)
+
+### Safety and monitoring
+- Basic validation is included (content-type, max upload size, corrupted images).
+- The API exposes `GET /health` and `GET /ready` for monitoring and readiness checks.
 
 ### Question 24
 
@@ -533,7 +632,12 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 28 fill here ---
+We implemented a minimal **frontend** to provide an end-to-end demo for non-technical users.
+
+- Built with plain **HTML/CSS/JavaScript** (no framework).
+- Uploads an image and sends it to `POST /predict` using `fetch` + `FormData`.
+- Displays the returned **predicted label** and **confidence score** in the page UI.
+
 
 ### Question 29
 

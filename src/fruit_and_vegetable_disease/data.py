@@ -1,11 +1,14 @@
 import torch
 import os
-from pathlib import Path
-from PIL import Image
 import numpy as np
-from sklearn.model_selection import train_test_split
 import requests
 import tarfile
+from pathlib import Path
+from transformers import ViTImageProcessorFast
+from PIL import Image
+from sklearn.model_selection import train_test_split
+
+DATA_URL= "https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/resolve/main/apple_data.tar.gz"
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
@@ -24,39 +27,32 @@ class_map = {
     "Apple__Rotten": 1,
 }
 
+image_processor = ViTImageProcessorFast.from_pretrained("google/vit-base-patch16-224")
 
 def download_and_extract_data(
-    url: str, target_dir: str, archive_name: str = "apple_data.tar.gz", remove_archive: bool = True
+    url: str, target_dir: str, archive_name: str = "training-data.tar.gz", remove_archive: bool = True
 ):
-    """Download a tar.gz archive and extract it to target_dir."""
-
+    """Download and extract a tar.gz on the fly using system pipes."""
     os.makedirs(target_dir, exist_ok=True)
     archive_path = os.path.join(target_dir, archive_name)
 
-    print("Downloading dataset...")
-    with requests.get(url, stream=True) as r:
-        r.raise_for_status()
-        with open(archive_path, "wb") as f:
-            for chunk in r.iter_content(chunk_size=1024 * 1024):
-                if chunk:
-                    f.write(chunk)
+    print(f"Downloading raw data from {url}...")
+    download_cmd = f"curl -sSL {url} -o {archive_path}"
+    download_exit_code = os.system(download_cmd)
+    
+    if download_exit_code != 0:
+        print("Error: raw data download failed.")
+        return
+    
+    extract_cmd = f"tar -xzf {archive_path} -C {target_dir} > /dev/null 2>&1"
+    extract_exit_code = os.system(extract_cmd)
 
-    print("Extracting dataset...")
-    with tarfile.open(archive_path, "r:gz") as tar:
-        tar.extractall(path=target_dir)
-
-    if remove_archive:
-        os.remove(archive_path)
-
-    print("Dataset ready at:", target_dir)
-
-
-def pil_to_tensor_grayscale(img: Image.Image, size: tuple[int, int] = (32, 32)) -> torch.Tensor:
-    """Convert PIL image to grayscale tensor (1, H, W) in [0, 1], resized."""
-    img = img.convert("L")
-    img = img.resize(size, Image.BILINEAR)
-    arr = np.array(img, dtype=np.float32) / 255.0
-    return torch.from_numpy(arr).unsqueeze(0)
+    if extract_exit_code == 0:
+        print(f"Raw data correctly extracted in {target_dir}")
+        if remove_archive and os.path.exists(archive_path):
+            os.remove(archive_path)
+    else:
+        print("Error: data extraction failed.") 
 
 
 def load_images(raw_dir: str):
@@ -85,9 +81,9 @@ def load_images(raw_dir: str):
                 continue
 
             full_img_path = class_dir / img_path
-            img = Image.open(full_img_path).convert("RGB")
-
-            images.append(pil_to_tensor_grayscale(img))
+            raw_img = Image.open(full_img_path).convert("RGB")
+            inputs = image_processor(raw_img, return_tensors="pt")
+            images.append(inputs['pixel_values'].squeeze(0))
             targets.append(label)
 
     images = torch.stack(images)  # (N, 1, H, W)
@@ -109,11 +105,6 @@ def split_data(images: torch.Tensor, targets: torch.Tensor) -> tuple:
     return X_train, X_test, y_train, y_test
 
 
-def normalize(images: torch.Tensor) -> torch.Tensor:
-    """Normalize images."""
-    return (images - images.mean()) / images.std()
-
-
 def preprocess_data(raw_dir: str, processed_dir: str) -> None:
     """Process raw data and save it to processed directory."""
     train_images: torch.Tensor = torch.load(f"{raw_dir}/train_images.pt")
@@ -122,13 +113,8 @@ def preprocess_data(raw_dir: str, processed_dir: str) -> None:
     test_images: torch.Tensor = torch.load(f"{raw_dir}/test_images.pt")
     test_target: torch.Tensor = torch.load(f"{raw_dir}/test_target.pt")
 
-    train_images = train_images.unsqueeze(1).float()
-    test_images = test_images.unsqueeze(1).float()
     train_target = train_target.long()
     test_target = test_target.long()
-
-    train_images = normalize(train_images)
-    test_images = normalize(test_images)
 
     torch.save(train_images, f"{processed_dir}/train_images.pt")
     torch.save(train_target, f"{processed_dir}/train_target.pt")
