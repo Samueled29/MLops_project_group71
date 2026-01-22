@@ -29,7 +29,6 @@ def _to_features_df(images: torch.Tensor, targets: torch.Tensor) -> pd.DataFrame
 		{
 			"pixel_mean": flat.mean(dim=1).cpu().numpy(),
 			"pixel_std": flat.std(dim=1, unbiased=False).cpu().numpy(),
-			"label": targets.cpu().numpy(),
 		}
 	)
 	return df
