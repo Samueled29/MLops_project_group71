@@ -1,8 +1,5 @@
 import torch
 import os
-import numpy as np
-import requests
-import tarfile
 from pathlib import Path
 from transformers import ViTImageProcessorFast
 from PIL import Image

@@ -1,6 +1,6 @@
 import torch
 import os
-from torchvision import datasets, transforms
+from torchvision import transforms
 
 INPUT_IMAGES = "data/processed/test_images.pt"
 INPUT_TARGETS = "data/processed/test_target.pt"
