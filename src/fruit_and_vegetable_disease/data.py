@@ -1,14 +1,13 @@
 import torch
 import os
-import numpy as np
-import requests
-import tarfile
 from pathlib import Path
 from transformers import ViTImageProcessorFast
 from PIL import Image
 from sklearn.model_selection import train_test_split
 
-DATA_URL= "https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/resolve/main/apple_data.tar.gz"
+DATA_URL = (
+    "https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/resolve/main/apple_data.tar.gz"
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
@@ -29,6 +28,7 @@ class_map = {
 
 image_processor = ViTImageProcessorFast.from_pretrained("google/vit-base-patch16-224")
 
+
 def download_and_extract_data(
     url: str, target_dir: str, archive_name: str = "training-data.tar.gz", remove_archive: bool = True
 ):
@@ -39,11 +39,11 @@ def download_and_extract_data(
     print(f"Downloading raw data from {url}...")
     download_cmd = f"curl -sSL {url} -o {archive_path}"
     download_exit_code = os.system(download_cmd)
-    
+
     if download_exit_code != 0:
         print("Error: raw data download failed.")
         return
-    
+
     extract_cmd = f"tar -xzf {archive_path} -C {target_dir} > /dev/null 2>&1"
     extract_exit_code = os.system(extract_cmd)
 
@@ -52,7 +52,7 @@ def download_and_extract_data(
         if remove_archive and os.path.exists(archive_path):
             os.remove(archive_path)
     else:
-        print("Error: data extraction failed.") 
+        print("Error: data extraction failed.")
 
 
 def load_images(raw_dir: str):
@@ -83,7 +83,7 @@ def load_images(raw_dir: str):
             full_img_path = class_dir / img_path
             raw_img = Image.open(full_img_path).convert("RGB")
             inputs = image_processor(raw_img, return_tensors="pt")
-            images.append(inputs['pixel_values'].squeeze(0))
+            images.append(inputs["pixel_values"].squeeze(0))
             targets.append(label)
 
     images = torch.stack(images)  # (N, 1, H, W)
