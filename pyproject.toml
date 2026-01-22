@@ -32,7 +32,7 @@ dependencies = [
     "pytest>=8.3.4",
     "python-multipart>=0.0.21",
     "scikit-learn>=1.8.0",
-    "torch==2.6.0",
+    "torch==2.10.0",
     "torch-tb-profiler>=0.4.3",
     "torchvision>=0.21.0",
     "transformers>=4.57.3",
