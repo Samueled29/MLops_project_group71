@@ -450,7 +450,10 @@ A **fixed random seed** is defined in the configuration and applied at runtime t
 >
 > Answer:
 
---- question 16 fill here ---
+Most bugs surfaced during experiments, so we used fast, reproducible loops: `uv run pytest` for unit tests, `uv run pytest tests/test_train.py -k small` to isolate failing cases, and reran `uv run python src/fruit_and_vegetable_disease/train.py` with verbose logging to inspect **Hydra** configs and warnings.
+
+We did not assume the code was perfect: we enabled the built-in **PyTorch profiler** for the first five batches, saved traces to `logs/profiler`, and viewed them in **TensorBoard**. The traces showed no dominant CPU or CUDA hotspot, so we keep profiling off by default to speed up iterations.
+
 
 ## Working in the cloud
 
