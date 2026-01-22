@@ -582,7 +582,10 @@ We implemented a **FastAPI** service to expose the trained model for inference.
 >
 > Answer:
 
---- question 25 fill here ---
+We implemented unit testing using pytest together with **FastAPI’s TestClient** to validate all API endpoints. The test suite (`tests/test_api.py`) contains six unit tests that cover the health and readiness endpoints, the prediction endpoint with valid image inputs, correct error handling for invalid content types (returning `HTTP 400`), proper behavior when the model is unavailable (returning `HTTP 503`), and validation of prediction outputs such as confidence values remaining within 0–1 and labels belonging to the expected set.
+All tests pass and can be executed via `uv run pytest tests/test_api.py`.
+
+For load testing, we used **Locust** to emulate realistic traffic patterns with weighted tasks for health checks, readiness checks, and image predictions. Under 50 concurrent users over 60 seconds, the API served 1,385 requests with zero failures, achieving 23.2 requests/second and maintaining low median latencies, including sub-25 ms for predictions.
 
 ### Question 26
 
