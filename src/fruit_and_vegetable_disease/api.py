@@ -156,6 +156,7 @@ async def predict(file: UploadFile = File(...)) -> PredictResponse:
     label_map = {0: "healthy", 1: "rotten"}
     return PredictResponse(prediction=label_map[pred_idx], confidence=confidence)
 
+
 # Endpoint to save the predictions to a csv file (separate from /predict for didactic purposes)
 
 CSV_FILE = Path("logs/predictions/predictions_log.csv")
@@ -170,23 +171,21 @@ if not CSV_FILE.exists():
         writer = csv.writer(f)
         writer.writerow(["timestamp", "image_name", "prediction", "confidence"])
 
+
 def log_prediction(image_name: str, prediction: str, confidence: float, tensor: torch.Tensor):
     timestamp = datetime.now().isoformat()
     with open(CSV_FILE, mode="a", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([timestamp, image_name, prediction, confidence])
-    
+
     # Save preprocessed tensor
     tensor_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}_{image_name}.pt"
     tensor_path = TENSOR_DIR / tensor_filename
     torch.save(tensor, tensor_path)
 
+
 @app.post("/predict_log", response_model=PredictResponse)
-async def predict_log(
-    background_tasks: BackgroundTasks,
-    file: UploadFile = File(...)
-) -> PredictResponse:
-    
+async def predict_log(background_tasks: BackgroundTasks, file: UploadFile = File(...)) -> PredictResponse:
     if model is None:
         raise HTTPException(status_code=503, detail="Model not loaded")
 
@@ -293,13 +292,9 @@ def drift_check() -> DriftCheckResponse:
         return DriftCheckResponse(
             status="completed",
             passed=all_passed,
-            message="Drift check completed successfully"
-            if all_passed
-            else "Drift detected in production data",
+            message="Drift check completed successfully" if all_passed else "Drift detected in production data",
         )
 
     except Exception as e:
         logger.exception("Drift check failed")
-        return DriftCheckResponse(
-            status="error", passed=False, message=f"Drift check error: {str(e)}"
-        )
+        return DriftCheckResponse(status="error", passed=False, message=f"Drift check error: {str(e)}")

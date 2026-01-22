@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import torch
 import hydra
 import wandb
-
+import os
+from pathlib import Path
 from typing import Dict, List
 from omegaconf import DictConfig, OmegaConf
 from torch.profiler import (
@@ -12,7 +13,15 @@ from torch.profiler import (
     profile,
 )
 
-from fruit_and_vegetable_disease.data import *
+from fruit_and_vegetable_disease.data import (
+    RAW_DATA_DIR,
+    download_and_extract_data,
+    DATA_URL,
+    load_images,
+    split_data,
+    preprocess_data,
+    create_datasets,
+)
 from fruit_and_vegetable_disease.model import Model
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
@@ -47,7 +56,7 @@ def train(cfg: DictConfig) -> None:
             url=DATA_URL,
             target_dir=RAW_DATA_DIR,
         )
-    
+
     if not os.path.exists(PROCESSED_DATA_DIR) or not os.listdir(PROCESSED_DATA_DIR):
         images, targets = load_images(RAW_DATA_DIR)
         split_data(images, targets)
@@ -132,7 +141,7 @@ def train(cfg: DictConfig) -> None:
     prof.stop()
     print("Training complete")
 
-    #TRAINING FINISHED
+    # TRAINING FINISHED
     try:
         print("\n=== Profiling Summary ===")
         print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))

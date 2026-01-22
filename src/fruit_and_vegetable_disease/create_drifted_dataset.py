@@ -21,17 +21,19 @@ print("Shape targets: ", targets.shape)
 
 # Introduce drift
 
-drift_transform = transforms.Compose([
-    transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
-    transforms.GaussianBlur(5),
-    transforms.RandomRotation(15),
-])
+drift_transform = transforms.Compose(
+    [
+        transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
+        transforms.GaussianBlur(5),
+        transforms.RandomRotation(15),
+    ]
+)
 
 # Apply drift transformation to each image
 drifted_images = []
 
 for img in images:
-    drifted= drift_transform(img)
+    drifted = drift_transform(img)
     drifted_images.append(drifted)
 
 drifted_images = torch.stack(drifted_images)
@@ -40,4 +42,3 @@ torch.save(drifted_images, OUTPUT_IMAGES)
 torch.save(targets, OUTPUT_TARGETS)
 
 print(f"Drifted dataset saved to {OUTPUT_DIR}")
-

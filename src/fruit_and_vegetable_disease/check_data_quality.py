@@ -5,8 +5,8 @@ import pandas as pd
 
 from evidently.legacy.test_suite import TestSuite
 from evidently.legacy.tests import (
-	TestNumberOfMissingValues,
-	TestShareOfDriftedColumns,
+    TestNumberOfMissingValues,
+    TestShareOfDriftedColumns,
 )
 
 
@@ -16,58 +16,58 @@ DRIFTED_DIR = PROJECT_ROOT / "data" / "drifted"
 
 
 def _ensure_nchw(x: torch.Tensor) -> torch.Tensor:
-	"""Ensure tensor is in NCHW format (batch, channels, height, width)."""
-	if x.dim() == 3:
-		return x.unsqueeze(1)
-	return x
+    """Ensure tensor is in NCHW format (batch, channels, height, width)."""
+    if x.dim() == 3:
+        return x.unsqueeze(1)
+    return x
 
 
 def _to_features_df(images: torch.Tensor, targets: torch.Tensor) -> pd.DataFrame:
-	"""Extract image features for drift detection."""
-	images = _ensure_nchw(images).float()
-	flat = images.view(images.size(0), -1)
-	df = pd.DataFrame(
-		{
-			"pixel_mean": flat.mean(dim=1).cpu().numpy(),
-			"pixel_std": flat.std(dim=1, unbiased=False).cpu().numpy(),
-			"label": targets.cpu().numpy(),
-		}
-	)
-	return df
+    """Extract image features for drift detection."""
+    images = _ensure_nchw(images).float()
+    flat = images.view(images.size(0), -1)
+    df = pd.DataFrame(
+        {
+            "pixel_mean": flat.mean(dim=1).cpu().numpy(),
+            "pixel_std": flat.std(dim=1, unbiased=False).cpu().numpy(),
+            "label": targets.cpu().numpy(),
+        }
+    )
+    return df
 
 
 def main() -> None:
-	"""Load data and run data quality tests."""
-	print("Loading reference data...")
-	ref_images = torch.load(PROCESSED_DIR / "train_images.pt")
-	ref_targets = torch.load(PROCESSED_DIR / "train_target.pt")
+    """Load data and run data quality tests."""
+    print("Loading reference data...")
+    ref_images = torch.load(PROCESSED_DIR / "train_images.pt")
+    ref_targets = torch.load(PROCESSED_DIR / "train_target.pt")
 
-	print("Loading current data...")
-	cur_images = torch.load(DRIFTED_DIR / "drifted_test_images.pt")
-	cur_targets = torch.load(DRIFTED_DIR / "drifted_test_target.pt")
+    print("Loading current data...")
+    cur_images = torch.load(DRIFTED_DIR / "drifted_test_images.pt")
+    cur_targets = torch.load(DRIFTED_DIR / "drifted_test_target.pt")
 
-	reference_data = _to_features_df(ref_images, ref_targets)
-	current_data = _to_features_df(cur_images, cur_targets)
+    reference_data = _to_features_df(ref_images, ref_targets)
+    current_data = _to_features_df(cur_images, cur_targets)
 
-	print("Running data quality tests...")
-	test_suite = TestSuite(
-		tests=[
-			TestNumberOfMissingValues(),
-			TestShareOfDriftedColumns(lt=0.5),
-		]
-	)
-	test_suite.run(reference_data=reference_data, current_data=current_data)
-	test_results = test_suite.as_dict()
+    print("Running data quality tests...")
+    test_suite = TestSuite(
+        tests=[
+            TestNumberOfMissingValues(),
+            TestShareOfDriftedColumns(lt=0.5),
+        ]
+    )
+    test_suite.run(reference_data=reference_data, current_data=current_data)
+    test_results = test_suite.as_dict()
 
-	all_passed = test_results["summary"]["all_passed"]
-	print(f"All tests passed: {all_passed}")
+    all_passed = test_results["summary"]["all_passed"]
+    print(f"All tests passed: {all_passed}")
 
-	if not all_passed:
-		print("\n❌ Data quality tests failed!")
-		sys.exit(1)
-	else:
-		print("\n✓ All data quality tests passed")
+    if not all_passed:
+        print("\n❌ Data quality tests failed!")
+        sys.exit(1)
+    else:
+        print("\n✓ All data quality tests passed")
 
 
 if __name__ == "__main__":
-	main()
+    main()

@@ -92,7 +92,7 @@ def test_normalize_img():
 @pytest.mark.skip(reason="normalize function removed from data.py")
 def test_normalize_empty_tensor():
     """Test if the normalize function handles an empty tensor without errors."""
-    empty_images = torch.empty((0, 1, 32, 32))
+    # empty_images = torch.empty((0, 1, 32, 32))
     # normalized_images = normalize(empty_images)
     # assert normalized_images.shape == empty_images.shape, "Normalized empty tensor should have the same shape as input"
     pass
