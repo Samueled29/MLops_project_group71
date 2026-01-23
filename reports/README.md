@@ -420,7 +420,7 @@ A **fixed random seed** is defined in the configuration and applied at runtime t
 >
 > Answer:
 
---- question 14 fill here ---
+![wandb](figures/wandb.jpeg)
 
 ### Question 15
 
@@ -485,7 +485,8 @@ We used the following services: Storage to create a bucket for storing the data 
 >
 > Answer:
 
---- question 18 fill here ---
+We used Google Cloud Compute Engine to run model training on a virtual machine so that we would have more resources than the ones available on our local machines. So we have a stable and reproducible environment for executing training and preprocessing workloads.
+The setup for the vm to run the training was: a vm of type e2-highmen-8 equipped with 8 vCPU, 64 GB of RAM, and 100 GB of disk space, running on Debian 12 (x86_64). The insrtance did not include GPU accelerators, so we only used CPU-based computations.  
 
 ### Question 19
 
@@ -527,7 +528,7 @@ We used the following services: Storage to create a bucket for storing the data 
 >
 > Answer:
 
---- question 22 fill here ---
+We trained our model using Cloud Engine. We chose Engine instead ov Vertex AI because, initially of quotas issues, and it was much harder to debug on vertex AI compared to Engine, so that if errors occur it is harder to understand where they happen and how to fix them. So, since we only needed more computational power, we stick with training on a VM to ease our workflow. We set up the hardware so that it would not take too long to train the model, and so that it had enough space to store the dataset to use for training.
 
 ## Deployment
 
