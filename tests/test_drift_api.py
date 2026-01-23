@@ -1,7 +1,7 @@
 import sys
 from datetime import datetime
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
@@ -123,9 +123,7 @@ class TestPredictLogEndpoint:
     @patch("fruit_and_vegetable_disease.drift_api.storage.Client")
     @patch("torch.save")
     @patch("pathlib.Path.unlink")
-    def test_predict_log_saves_successfully(
-        self, mock_unlink, mock_torch_save, mock_storage_client, drift_client
-    ):
+    def test_predict_log_saves_successfully(self, mock_unlink, mock_torch_save, mock_storage_client, drift_client):
         """Test that predict_log saves prediction to bucket."""
         mock_bucket = MagicMock()
         mock_blob = MagicMock()
@@ -163,9 +161,7 @@ class TestPredictLogEndpoint:
     @patch("fruit_and_vegetable_disease.drift_api.storage.Client")
     @patch("torch.save")
     @patch("pathlib.Path.unlink")
-    def test_predict_log_uses_provided_timestamp(
-        self, mock_unlink, mock_torch_save, mock_storage_client, drift_client
-    ):
+    def test_predict_log_uses_provided_timestamp(self, mock_unlink, mock_torch_save, mock_storage_client, drift_client):
         """Test that predict_log uses provided timestamp."""
         mock_bucket = MagicMock()
         mock_blob = MagicMock()
@@ -267,9 +263,7 @@ class TestDriftCheckEndpoint:
 
         # Setup TestSuite mock
         mock_suite_instance = MagicMock()
-        mock_suite_instance.as_dict.return_value = {
-            "summary": {"all_passed": True}
-        }
+        mock_suite_instance.as_dict.return_value = {"summary": {"all_passed": True}}
         mock_test_suite.return_value = mock_suite_instance
 
         with patch("torch.load") as torch_load_patch:
@@ -318,9 +312,7 @@ class TestDriftCheckEndpoint:
 
         # Setup TestSuite mock - no drift passed
         mock_suite_instance = MagicMock()
-        mock_suite_instance.as_dict.return_value = {
-            "summary": {"all_passed": False}
-        }
+        mock_suite_instance.as_dict.return_value = {"summary": {"all_passed": False}}
         mock_test_suite.return_value = mock_suite_instance
 
         with patch("torch.load") as torch_load_patch:
@@ -339,9 +331,7 @@ class TestDriftCheckEndpoint:
 
     @patch("fruit_and_vegetable_disease.drift_api.TestSuite")
     @patch("fruit_and_vegetable_disease.drift_api.storage.Client")
-    def test_drift_check_error_handling(
-        self, mock_storage_client, mock_test_suite, drift_client
-    ):
+    def test_drift_check_error_handling(self, mock_storage_client, mock_test_suite, drift_client):
         """Test drift check error handling."""
         mock_client = MagicMock()
         mock_client.bucket.side_effect = Exception("GCS connection error")
@@ -429,9 +419,7 @@ class TestDriftCheckEndpoint:
 
         # Setup TestSuite mock
         mock_suite_instance = MagicMock()
-        mock_suite_instance.as_dict.return_value = {
-            "summary": {"all_passed": True}
-        }
+        mock_suite_instance.as_dict.return_value = {"summary": {"all_passed": True}}
         mock_test_suite.return_value = mock_suite_instance
 
         with patch("torch.load") as torch_load_patch:
@@ -469,9 +457,7 @@ class TestDriftCheckResponseModel:
         """Test DriftCheckResponse validation."""
         from fruit_and_vegetable_disease.drift_api import DriftCheckResponse
 
-        response = DriftCheckResponse(
-            status="error", passed=False, message="Error occurred"
-        )
+        response = DriftCheckResponse(status="error", passed=False, message="Error occurred")
 
         assert response.status == "error"
         assert response.passed is False
