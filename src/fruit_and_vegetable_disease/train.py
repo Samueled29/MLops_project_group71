@@ -43,11 +43,9 @@ def train(cfg: DictConfig) -> None:
     )
 
     # DATA DOWNLOADING, DATA PREPROCESSING AND DATASET CREATION
-    if not RAW_DATA_DIR.exists() or not any(RAW_DATA_DIR.iterdir()):
-        download_and_extract_data(
-            url=DATA_URL,
-            target_dir=RAW_DATA_DIR,
-        )
+    create_data_dir_structure()
+    if not any(RAW_DATA_DIR.iterdir()):
+        download_and_extract_data(target_dir=RAW_DATA_DIR)
     
     if not os.path.exists(PROCESSED_DATA_DIR) or not os.listdir(PROCESSED_DATA_DIR):
         images, targets = load_images(RAW_DATA_DIR)
