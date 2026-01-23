@@ -15,8 +15,9 @@ from torch.profiler import (
 
 from fruit_and_vegetable_disease.data import (
     RAW_DATA_DIR,
+    PROCESSED_DATA_DIR,
+    create_data_dir_structure,
     download_and_extract_data,
-    DATA_URL,
     load_images,
     split_data,
     preprocess_data,
@@ -27,7 +28,6 @@ from fruit_and_vegetable_disease.model import Model
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
 # Paths
-PROCESSED_DATA_DIR = Path("data/processed")  # Local path to processed data
 BUCKET_PATH = "gs://fruit-and-veg-disease-data_bucket/processed"  # Cloud storage path
 
 
@@ -54,7 +54,7 @@ def train(cfg: DictConfig) -> None:
     create_data_dir_structure()
     if not any(RAW_DATA_DIR.iterdir()):
         download_and_extract_data(target_dir=RAW_DATA_DIR)
-    
+
     if not os.path.exists(PROCESSED_DATA_DIR) or not os.listdir(PROCESSED_DATA_DIR):
         images, targets = load_images(RAW_DATA_DIR)
         split_data(images, targets)

@@ -1,8 +1,5 @@
 import torch
 import os
-import numpy as np
-import requests
-import tarfile
 import shutil
 from pathlib import Path
 from transformers import ViTImageProcessorFast
@@ -26,30 +23,32 @@ class_map = {
 
 image_processor = ViTImageProcessorFast.from_pretrained("google/vit-base-patch16-224")
 
+
 def create_data_dir_structure() -> None:
     """Create data directory structure."""
     os.makedirs(RAW_DATA_DIR, exist_ok=True)
     os.makedirs(PROCESSED_DATA_DIR, exist_ok=True)
 
+
 def download_and_extract_data(target_dir: str, remove_archive: bool = True) -> None:
     """Download tar.gz files from GCP using DVC and extract them."""
-    print(f"Downloading raw data using DVC...")
+    print("Downloading raw data using DVC...")
     # Try uv first, go back to regular dvc if uv is not available
     download_cmd = "uv run dvc pull" if shutil.which("uv") else "dvc pull"
     download_exit_code = os.system(download_cmd)
     if download_exit_code != 0:
         print("Error: raw data download failed.")
         return
-    
+
     # Extract both tar.gz files
     tar_files = ["Apple__Healthy.tar.gz", "Apple__Rotten.tar.gz"]
-    
+
     for tar_file in tar_files:
         archive_path = os.path.join(target_dir, tar_file)
         if not os.path.exists(archive_path):
             print(f"Warning: {tar_file} not found in {target_dir}")
             continue
-            
+
         extract_cmd = f"tar -xzf {archive_path} -C {target_dir} > /dev/null 2>&1"
         extract_exit_code = os.system(extract_cmd)
         if extract_exit_code == 0:
