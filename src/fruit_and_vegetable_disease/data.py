@@ -21,13 +21,32 @@ class_map = {
     "Apple__Rotten": 1,
 }
 
-image_processor = ViTImageProcessorFast.from_pretrained("google/vit-base-patch16-224")
+MODEL_NAME = "WinKawaks/vit-tiny-patch16-224"
+TARGET_CHANNELS = 3
+TARGET_IMAGE_SIZE = 224
+
+image_processor = ViTImageProcessorFast.from_pretrained(MODEL_NAME)
 
 
 def create_data_dir_structure() -> None:
     """Create data directory structure."""
     os.makedirs(RAW_DATA_DIR, exist_ok=True)
     os.makedirs(PROCESSED_DATA_DIR, exist_ok=True)
+
+
+def is_processed_data_valid(processed_dir: str | Path) -> bool:
+    """Return True if processed data exists with expected shape."""
+    processed_dir = Path(processed_dir)
+    try:
+        train_images = torch.load(processed_dir / "train_images.pt", map_location="cpu")
+    except (FileNotFoundError, RuntimeError):
+        return False
+
+    if train_images.ndim != 4:
+        return False
+
+    _, channels, height, width = train_images.shape
+    return channels == TARGET_CHANNELS and height == TARGET_IMAGE_SIZE and width == TARGET_IMAGE_SIZE
 
 
 def download_and_extract_data(target_dir: str, remove_archive: bool = True) -> None:

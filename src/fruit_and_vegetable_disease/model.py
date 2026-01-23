@@ -2,6 +2,8 @@ import torch
 from torch import nn
 from transformers import ViTForImageClassification, ViTImageProcessor
 
+MODEL_NAME = "WinKawaks/vit-tiny-patch16-224"
+
 
 class Model(nn.Module):
     """Vision Transformer model for fruit and vegetable disease classification."""
@@ -14,20 +16,18 @@ class Model(nn.Module):
             pretrained: Whether to load pretrained weights.
         """
         super().__init__()
-        model_name = "google/vit-base-patch16-224"  # Base model (86M params)
-        model_name = "WinKawaks/vit-tiny-patch16-224"  # Tiny model (5M params)
 
         if pretrained:
             self.model = ViTForImageClassification.from_pretrained(
-                model_name, num_labels=num_classes, ignore_mismatched_sizes=True
+                MODEL_NAME, num_labels=num_classes, ignore_mismatched_sizes=True
             )
         else:
             from transformers import ViTConfig
 
-            config = ViTConfig.from_pretrained(model_name, num_labels=num_classes)
+            config = ViTConfig.from_pretrained(MODEL_NAME, num_labels=num_classes)
             self.model = ViTForImageClassification(config)
 
-        self.processor = ViTImageProcessor.from_pretrained(model_name)
+        self.processor = ViTImageProcessor.from_pretrained(MODEL_NAME)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass through the model.
