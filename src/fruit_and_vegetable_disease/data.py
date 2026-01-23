@@ -147,5 +147,5 @@ if __name__ == "__main__":
         images, targets = load_images(RAW_DATA_DIR)
         split_data(images, targets)
         preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)
-    
+
     train_set, test_set = create_datasets(PROCESSED_DATA_DIR)
