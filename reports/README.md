@@ -134,7 +134,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
-s242916, s253125, s253762, s243599, 
+s242916, s253125, s253762, s243599, s253136
 
 ### Question 3
 > **Did you end up using any open-source frameworks/packages not covered in the course during your project? If so**
@@ -220,7 +220,7 @@ These practices are especially important in larger projects where multiple devel
 >
 > Answer:
 
-We have implemented 23 tests that test the source code located in the src folder. The file test_data.py checks if the the download of the files works correctly and if the proper directories are created. It also checks if the images and labels have correct properties, and if data splitting and normalizing create a desired output. The test_model.py checks if the model output has correct type and shape and the test_train.py checks the properties of input and output of the training process as well as the resizing of the images and the accuracy calculation.
+We have implemented 49 tests that test the source code located in the src folder. The file test_data.py checks if the the download of the files works correctly and if the proper directories are created. It also checks if the images and labels have correct properties, and if data splitting and normalizing create a desired output. The test_model.py checks if the model output has correct type and shape and the test_train.py checks the properties of input and output of the training process as well as the resizing of the images and the accuracy calculation.
 
 ### Question 8
 
@@ -235,7 +235,7 @@ We have implemented 23 tests that test the source code located in the src folder
 >
 > Answer:
 
-The total coverage of our code is 49%, which does not cover all our source code (no tests for evaluate.py). We are far from 100% coverage of our code and even if we were then it does not mean the code is bug free. Some not obvious test cases could be missed and lead to errors.
+The total coverage of our code is 39%, which does not cover all our source code (no tests for evaluate.py). We are far from 100% coverage of our code and even if we were then it does not mean the code is bug free. Some not obvious test cases could be missed and lead to errors.
 
 ### Question 9
 
