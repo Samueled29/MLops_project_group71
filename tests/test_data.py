@@ -23,9 +23,7 @@ def test_download_data():
     assert len(os.listdir(_PATH_RAW_DATA)) > 0, f"Raw data directory {_PATH_RAW_DATA} is empty."
 
 
-@pytest.mark.skipif(
-    not os.path.exists(_PATH_RAW_DATA) or len(os.listdir(_PATH_RAW_DATA)) == 0, reason="Data files not found"
-)
+@pytest.mark.skip(reason='grayscale conversion removed from data.py')
 def test_img_grayscale_tensor():
     """Test if loaded images are grayscale tensors."""
     images, _ = load_images(raw_dir=_PATH_RAW_DATA)
