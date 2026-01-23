@@ -15,9 +15,11 @@ from PIL import Image, UnidentifiedImageError
 
 from transformers import ViTImageProcessorFast
 
-image_processor = ViTImageProcessorFast.from_pretrained("google/vit-base-patch16-224")
 
 from fruit_and_vegetable_disease.model import Model
+
+
+image_processor = ViTImageProcessorFast.from_pretrained("google/vit-base-patch16-224")
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -48,9 +50,6 @@ def preprocess_image(file_obj) -> torch.Tensor:
     img = Image.open(file_obj).convert("RGB")
     inputs = image_processor(img, return_tensors="pt")  # includes resize + normalization
     return inputs["pixel_values"]  # shape: (1, 3, 224, 224)
-
-
-
 
 
 @asynccontextmanager
@@ -98,8 +97,6 @@ if FRONTEND_DIR.exists():
         return FileResponse(INDEX_HTML)
 
 
-
-
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
@@ -124,6 +121,7 @@ async def predict(file: UploadFile = File(...)) -> PredictResponse:
 
     try:
         from io import BytesIO
+
         x = preprocess_image(BytesIO(data)).to(DEVICE)
     except UnidentifiedImageError:
         raise HTTPException(status_code=400, detail="Invalid or corrupted image file")
