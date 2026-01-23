@@ -103,18 +103,18 @@ will check the repositories and the code to verify your answers.
 * [ ] Instrument your API with a couple of system metrics (M28)
 * [ ] Setup cloud monitoring of your instrumented application (M28)
 * [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
-* [ ] If applicable, optimize the performance of your data loading using distributed data loading (M29)
+* [x] If applicable, optimize the performance of your data loading using distributed data loading (M29)
 * [ ] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
 * [ ] Play around with quantization, compilation and pruning for you trained models to increase inference speed (M31)
 
 ### Extra
 
-* [ ] Write some documentation for your application (M32)
+* [x] Write some documentation for your application (M32)
 * [ ] Publish the documentation to GitHub Pages (M32)
 * [ ] Revisit your initial project description. Did the project turn out as you wanted?
-* [ ] Create an architectural diagram over your MLOps pipeline
-* [ ] Make sure all group members have an understanding about all parts of the project
-* [ ] Uploaded all your code to GitHub
+* [x] Create an architectural diagram over your MLOps pipeline
+* [x] Make sure all group members have an understanding about all parts of the project
+* [x] Uploaded all your code to GitHub
 
 ## Group information
 
@@ -422,6 +422,16 @@ A **fixed random seed** is defined in the configuration and applied at runtime t
 
 ![wandb](figures/wandb.jpeg)
 
+We track metrics that describe how well our model is learning and how training evolves over time, both at a fine-grained level and in aggregate.
+
+First, we log loss because it measures the training objective directly and tells us how wrong the model’s predictions are. Batch loss is computed on each mini-batch and gives immediate feedback about optimization dynamics. It can be noisy, but spikes may reveal instability (e.g., learning rate issues) or problematic batches in the data pipeline. Epoch loss averages the loss over an entire epoch, producing a smoother signal that is easier to interpret and compare across runs. A consistent decrease in epoch loss indicates that training is converging.
+
+Second, we log accuracy to track classification performance. Batch accuracy shows short-term predictive behavior on individual batches and helps us confirm that improvements in loss translate into better predictions, even though it fluctuates due to batch variability. Epoch accuracy aggregates accuracy over the full epoch and serves as our main indicator of overall training performance, making it useful for comparing experiments and hyperparameter settings.
+
+Finally, we log progress indicators such as the current epoch and batch step. These metrics do not reflect model quality directly, but they provide essential context for interpreting the curves, aligning results across experiments, and ensuring that logging occurs at the intended frequency.
+
+Overall, batch-level metrics help us diagnose training behavior in detail, while epoch-level metrics provide stable signals for monitoring convergence and reporting results.
+
 ### Question 15
 
 > **Docker is an important tool for creating containerized applications. Explain how you used docker in your**
@@ -677,13 +687,13 @@ We implemented a minimal **frontend** to provide an end-to-end demo for non-tech
 > Answer:
 
 ![architecture](figures/architecture.png)
-Lo sviluppatore lavora sulla propria macchina locale scrivendo il codice dell’applicazione, del modello e della procedura di training. La gestione delle configurazioni viene effettuata tramite Hydra, che consente di controllare in modo strutturato iperparametri, percorsi e modalità di esecuzione. Durante l’addestramento del modello, Weights & Biases viene utilizzato per tracciare metriche, log, artefatti e per lanciare sweep di iperparametri, permettendo un confronto sistematico tra diversi esperimenti.
+The developer works on their local machine, writing the application code, model, and training procedure. Configuration management is handled using Hydra, which allows structured control over hyperparameters, paths, and execution modes. During model training, Weights & Biases is used to track metrics, logs, artifacts, and to launch hyperparameter sweeps, enabling a systematic comparison between different experiments.
 
-Una volta completate le modifiche, il codice viene versionato tramite Git. Prima del commit possono essere eseguiti controlli automatici locali, come pre-commit hook per il linting o test preliminari. Successivamente il codice viene committato e pushato su GitHub, che funge da punto centrale di coordinamento per il progetto.
+Once changes are completed, the code is versioned using Git. Before committing, local automated checks can be executed, such as pre-commit hooks for linting or preliminary tests. Afterwards, the code is committed and pushed to GitHub, which serves as the central coordination point for the project.
 
-Il push su GitHub attiva automaticamente una pipeline di Continuous Integration tramite GitHub Actions. In questa fase il codice viene validato eseguendo test automatici e controlli di qualità. Se la pipeline ha esito positivo, GitHub attiva il processo di build su Google Cloud Platform. Qui l’applicazione viene containerizzata creando una Docker image che include il codice, le dipendenze e il modello, e l’immagine risultante viene salvata sul cloud.
+The push to GitHub automatically triggers a Continuous Integration pipeline via GitHub Actions. During this phase, the code is validated by running automated tests and quality checks. If the pipeline passes successfully, GitHub initiates the build process on Google Cloud Platform, where the application is containerized into a Docker image that includes the code, dependencies, and the model. The resulting image is then stored in the cloud.
 
-Dal container registry l’immagine Docker può essere scaricata ed eseguita. Il servizio avviato espone un’API backend, che rappresenta il punto di accesso al modello in produzione. Un frontend o un client esterno interagisce con questa API inviando richieste e ricevendo le predizioni del modello.
+From the container registry, the Docker image can be pulled and executed. The running service exposes a backend API, which serves as the access point to the model in production. A frontend or external client interacts with this API by sending requests and receiving the model’s predictions.
 
 ### Question 30
 
