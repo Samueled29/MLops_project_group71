@@ -52,7 +52,7 @@ def train(cfg: DictConfig) -> None:
 
     # DATA DOWNLOADING, DATA PREPROCESSING AND DATASET CREATION
     create_data_dir_structure()
-    if not any(RAW_DATA_DIR.iterdir()):
+    if not (RAW_DATA_DIR / "Apple__Healthy").exists() or not (RAW_DATA_DIR / "Apple__Rotten").exists():
         download_and_extract_data(target_dir=RAW_DATA_DIR)
 
     if not os.listdir(PROCESSED_DATA_DIR):
