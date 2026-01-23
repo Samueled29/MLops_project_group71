@@ -28,6 +28,8 @@ venv/
 
 # --- Project artifacts (ML) ---
 data/
+!data/processed/train_images.pt
+!data/processed/train_target.pt
 outputs/
 wandb/
 reports/figures/
