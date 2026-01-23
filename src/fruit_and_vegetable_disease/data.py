@@ -101,9 +101,9 @@ def split_data(images: torch.Tensor, targets: torch.Tensor) -> tuple:
         images, targets, test_size=test_size, random_state=seed, stratify=targets
     )
 
-    torch.save(X_train.squeeze(1), RAW_DATA_DIR / "train_images.pt")
+    torch.save(X_train, RAW_DATA_DIR / "train_images.pt")
     torch.save(y_train, RAW_DATA_DIR / "train_target.pt")
-    torch.save(X_test.squeeze(1), RAW_DATA_DIR / "test_images.pt")
+    torch.save(X_test, RAW_DATA_DIR / "test_images.pt")
     torch.save(y_test, RAW_DATA_DIR / "test_target.pt")
 
     return X_train, X_test, y_train, y_test
