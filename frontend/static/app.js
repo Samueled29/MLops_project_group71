@@ -108,5 +108,3 @@ runBtn.addEventListener("click", async () => {
     runBtn.textContent = "Check image";
   }
 });
-
-
