@@ -55,7 +55,7 @@ def train(cfg: DictConfig) -> None:
     if not any(RAW_DATA_DIR.iterdir()):
         download_and_extract_data(target_dir=RAW_DATA_DIR)
 
-    if not os.path.exists(PROCESSED_DATA_DIR) or not os.listdir(PROCESSED_DATA_DIR):
+    if not os.listdir(PROCESSED_DATA_DIR):
         images, targets = load_images(RAW_DATA_DIR)
         split_data(images, targets)
         preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)

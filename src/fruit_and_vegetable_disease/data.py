@@ -139,13 +139,13 @@ def create_datasets(processed_dir: str) -> tuple[torch.utils.data.Dataset, torch
 
 
 if __name__ == "__main__":
-    # execute the data download only if raw_data_dir is empty
-    if not RAW_DATA_DIR.exists() or not any(RAW_DATA_DIR.iterdir()):
-        download_and_extract_data(
-            url="https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/resolve/main/apple_data.tar.gz",
-            target_dir=RAW_DATA_DIR,
-        )
-    images, targets = load_images(RAW_DATA_DIR)
-    split_data(images, targets)
-    preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)
-    create_datasets(PROCESSED_DATA_DIR)
+    create_data_dir_structure()
+    if not any(RAW_DATA_DIR.iterdir()):
+        download_and_extract_data(target_dir=RAW_DATA_DIR)
+
+    if not os.listdir(PROCESSED_DATA_DIR):
+        images, targets = load_images(RAW_DATA_DIR)
+        split_data(images, targets)
+        preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)
+    
+    train_set, test_set = create_datasets(PROCESSED_DATA_DIR)
