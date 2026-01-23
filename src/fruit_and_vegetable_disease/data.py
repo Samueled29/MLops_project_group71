@@ -1,22 +1,17 @@
 import torch
 import os
+import shutil
 from pathlib import Path
 from transformers import ViTImageProcessorFast
 from PIL import Image
 from sklearn.model_selection import train_test_split
 
-DATA_URL = (
-    "https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/resolve/main/apple_data.tar.gz"
-)
+# DATA_URL= "https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/resolve/main/apple_data.tar.gz"
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
-
-RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
-PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
-
 
 test_size = 0.2
 seed = 42
@@ -29,30 +24,39 @@ class_map = {
 image_processor = ViTImageProcessorFast.from_pretrained("google/vit-base-patch16-224")
 
 
-def download_and_extract_data(
-    url: str, target_dir: str, archive_name: str = "training-data.tar.gz", remove_archive: bool = True
-):
-    """Download and extract a tar.gz on the fly using system pipes."""
-    os.makedirs(target_dir, exist_ok=True)
-    archive_path = os.path.join(target_dir, archive_name)
+def create_data_dir_structure() -> None:
+    """Create data directory structure."""
+    os.makedirs(RAW_DATA_DIR, exist_ok=True)
+    os.makedirs(PROCESSED_DATA_DIR, exist_ok=True)
 
-    print(f"Downloading raw data from {url}...")
-    download_cmd = f"curl -sSL {url} -o {archive_path}"
+
+def download_and_extract_data(target_dir: str, remove_archive: bool = True) -> None:
+    """Download tar.gz files from GCP using DVC and extract them."""
+    print("Downloading raw data using DVC...")
+    # Try uv first, go back to regular dvc if uv is not available
+    download_cmd = "uv run dvc pull" if shutil.which("uv") else "dvc pull"
     download_exit_code = os.system(download_cmd)
-
     if download_exit_code != 0:
         print("Error: raw data download failed.")
         return
 
-    extract_cmd = f"tar -xzf {archive_path} -C {target_dir} > /dev/null 2>&1"
-    extract_exit_code = os.system(extract_cmd)
+    # Extract both tar.gz files
+    tar_files = ["Apple__Healthy.tar.gz", "Apple__Rotten.tar.gz"]
 
-    if extract_exit_code == 0:
-        print(f"Raw data correctly extracted in {target_dir}")
-        if remove_archive and os.path.exists(archive_path):
-            os.remove(archive_path)
-    else:
-        print("Error: data extraction failed.")
+    for tar_file in tar_files:
+        archive_path = os.path.join(target_dir, tar_file)
+        if not os.path.exists(archive_path):
+            print(f"Warning: {tar_file} not found in {target_dir}")
+            continue
+
+        extract_cmd = f"tar -xzf {archive_path} -C {target_dir} > /dev/null 2>&1"
+        extract_exit_code = os.system(extract_cmd)
+        if extract_exit_code == 0:
+            print(f"Raw data correctly extracted from {tar_file} in {target_dir}")
+            if remove_archive:
+                os.remove(archive_path)
+        else:
+            print(f"Error: extraction of {tar_file} failed.")
 
 
 def load_images(raw_dir: str):
@@ -135,13 +139,13 @@ def create_datasets(processed_dir: str) -> tuple[torch.utils.data.Dataset, torch
 
 
 if __name__ == "__main__":
-    # execute the data download only if raw_data_dir is empty
-    if not RAW_DATA_DIR.exists() or not any(RAW_DATA_DIR.iterdir()):
-        download_and_extract_data(
-            url="https://huggingface.co/datasets/zolen/fruit_and_vegetable_disease_kaggle_mirror/resolve/main/apple_data.tar.gz",
-            target_dir=RAW_DATA_DIR,
-        )
-    images, targets = load_images(RAW_DATA_DIR)
-    split_data(images, targets)
-    preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)
-    create_datasets(PROCESSED_DATA_DIR)
+    create_data_dir_structure()
+    if not any(RAW_DATA_DIR.iterdir()):
+        download_and_extract_data(target_dir=RAW_DATA_DIR)
+
+    if not os.listdir(PROCESSED_DATA_DIR):
+        images, targets = load_images(RAW_DATA_DIR)
+        split_data(images, targets)
+        preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)
+
+    train_set, test_set = create_datasets(PROCESSED_DATA_DIR)
