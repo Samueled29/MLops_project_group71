@@ -2,7 +2,7 @@ defaults:
   - dataset: apple
   - model: vit_base
   - optimizer: adam
-  - experiments: base
+  - experiments: exp_fast
   - _self_
 
 wandb:

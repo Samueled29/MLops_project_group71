@@ -22,6 +22,7 @@ from fruit_and_vegetable_disease.data import (
     split_data,
     preprocess_data,
     create_datasets,
+    is_processed_data_valid,
 )
 from fruit_and_vegetable_disease.model import Model
 
@@ -55,7 +56,8 @@ def train(cfg: DictConfig) -> None:
     if not (RAW_DATA_DIR / "Apple__Healthy").exists() or not (RAW_DATA_DIR / "Apple__Rotten").exists():
         download_and_extract_data(target_dir=RAW_DATA_DIR)
 
-    if not os.listdir(PROCESSED_DATA_DIR):
+    if not is_processed_data_valid(PROCESSED_DATA_DIR):
+        print("Regenerating processed data to 3-channel 224x224 format")
         images, targets = load_images(RAW_DATA_DIR)
         split_data(images, targets)
         preprocess_data(RAW_DATA_DIR, PROCESSED_DATA_DIR)
