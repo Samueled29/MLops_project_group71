@@ -14,5 +14,20 @@ The Fruit and Vegetable Disease dataset (https://www.kaggle.com/datasets/muhamma
 ## Training of the model:
 
 The model has been trained and validated using the following commands
+```bash
 uv run python -m fruit_and_vegetable_disease.train --batch-size 4 --epochs 5 --lr 0.0001
 uv run python -m fruit_and_vegetable_disease.evaluate models/model.pth --batch-size 8
+```
+
+
+Clone the repository and build the API image with
+```bash
+docker build -f dockerfiles/api.dockerfile -t fruit-api:local .
+```
+
+Run the container exposing the service with
+```bash
+docker run -p 8000:8000 fruit-api:local
+```
+
+Open the application at http://localhost:8000 (or http://127.0.0.1:8000) to access the frontend and API.
