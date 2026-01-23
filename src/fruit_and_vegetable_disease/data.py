@@ -88,7 +88,7 @@ def load_images(raw_dir: str):
             full_img_path = class_dir / img_path
             raw_img = Image.open(full_img_path).convert("RGB")
             inputs = image_processor(raw_img, return_tensors="pt")
-            images.append(inputs['pixel_values'].squeeze(0))
+            images.append(inputs["pixel_values"].squeeze(0))
             targets.append(label)
 
     images = torch.stack(images)  # (N, 1, H, W)

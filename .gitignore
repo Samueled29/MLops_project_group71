@@ -198,8 +198,6 @@ models/*.pt
 !models/.gitkeep
 
 # Training figures
-reports/figures/*.png
-reports/figures/*.jpg
 !reports/figures/.gitkeep
 
 # Hydra multirun outputs
