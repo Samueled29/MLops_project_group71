@@ -17,13 +17,11 @@ from fruit_and_vegetable_disease.model import Model
 from fruit_and_vegetable_disease.data import (
     RAW_DATA_DIR,
     PROCESSED_DATA_DIR,
-    DATA_URL,
     download_and_extract_data,
     load_images,
     split_data,
     preprocess_data,
     create_datasets,
-    is_processed_data_valid,
 )
 
 DEVICE = torch.device(
