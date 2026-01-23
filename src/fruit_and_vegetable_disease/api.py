@@ -146,4 +146,3 @@ async def predict(file: UploadFile = File(...)) -> PredictResponse:
 
     label_map = {0: "healthy", 1: "rotten"}
     return PredictResponse(prediction=label_map[pred_idx], confidence=confidence)
-

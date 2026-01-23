@@ -53,11 +53,8 @@ def predict_log(data: PredictionLog):
         # Convert back to tensor and save to temp file
         tensor = torch.tensor(data.image_tensor)
         temp_path = Path(f"/tmp/pred_{data.timestamp.replace(':', '-').replace('.', '_')}.pt")
-        
-        torch.save(
-            {"image": tensor, "prediction": data.prediction, "timestamp": data.timestamp}, 
-            temp_path
-        )
+
+        torch.save({"image": tensor, "prediction": data.prediction, "timestamp": data.timestamp}, temp_path)
 
         # Upload to bucket
         blob = bucket.blob(filename)
@@ -97,7 +94,7 @@ def drift_check(n_predictions: int = 100):
         # Load training data
         project_root = Path(__file__).resolve().parents[2]
         processed_dir = project_root / "data" / "processed"
-        
+
         train_images = torch.load(processed_dir / "train_images.pt")
         train_targets = torch.load(processed_dir / "train_target.pt")
 
@@ -107,9 +104,7 @@ def drift_check(n_predictions: int = 100):
         blobs = list(bucket.list_blobs(prefix=PREDICTIONS_PREFIX))
 
         if not blobs:
-            return DriftCheckResponse(
-                status="no_data", passed=True, message="No predictions found in bucket"
-            )
+            return DriftCheckResponse(status="no_data", passed=True, message="No predictions found in bucket")
 
         # Sort by time (most recent first) and take last N
         blobs.sort(key=lambda x: x.updated, reverse=True)
@@ -128,9 +123,7 @@ def drift_check(n_predictions: int = 100):
             temp_path.unlink()
 
         if not pred_images:
-            return DriftCheckResponse(
-                status="no_data", passed=True, message="No valid predictions found"
-            )
+            return DriftCheckResponse(status="no_data", passed=True, message="No valid predictions found")
 
         # Stack into tensors
         prod_images = torch.stack(pred_images)
