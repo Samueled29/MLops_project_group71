@@ -97,9 +97,9 @@ will check the repositories and the code to verify your answers.
 
 ### Week 3
 
-* [ ] Check how robust your model is towards data drifting (M27)
-* [ ] Setup collection of input-output data from your deployed application (M27)
-* [ ] Deploy to the cloud a drift detection API (M27)
+* [x] Check how robust your model is towards data drifting (M27)
+* [x] Setup collection of input-output data from your deployed application (M27)
+* [x] Deploy to the cloud a drift detection API (M27)
 * [ ] Instrument your API with a couple of system metrics (M28)
 * [ ] Setup cloud monitoring of your instrumented application (M28)
 * [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
@@ -435,7 +435,7 @@ A **fixed random seed** is defined in the configuration and applied at runtime t
 >
 > Answer:
 
---- question 15 fill here ---
+For the project, we used different docker images. one for training, for which we set up a trigger with GCP, so that every time a push happens on the main branch of the repository, a docker image is built on the cloud (then we only saved the latest ones). Another image is for the api to run them. Finally, another image has been created when deploying the api to check drift in the data during the monitorin part, so it has been uploaded to GCP as well.
 
 ### Question 16
 
@@ -503,7 +503,7 @@ We used the following services: Storage to create a bucket for storing the data 
 >
 > Answer:
 
---- question 20 fill here ---
+![registry](figures/registry.jpeg)
 
 ### Question 21
 
@@ -512,7 +512,7 @@ We used the following services: Storage to create a bucket for storing the data 
 >
 > Answer:
 
---- question 21 fill here ---
+![build](figures/build.jpeg)
 
 ### Question 22
 
@@ -603,7 +603,7 @@ For load testing, we used **Locust** to emulate realistic traffic patterns with 
 >
 > Answer:
 
---- question 26 fill here ---
+We implemented monitoring. First, since our model works with classification of images, we tried to implement an artificial drift of the images,using create_drifted_dataset.py (adding blur and other modifications) so that we would have a drifted dataset, then we run the script check_data_drift.py we generate an html report to see if the dataset has actually drifted, and we do a test with the script check_data_quality.py. After this was done, we tested our model on the original and drifted dataset, and we saw that the model performance were somewhat similar, so that the model was robust to this kind of drift. However, drift in dataset balance has not been tested. Then we wrote an API to log new data and to run a drift test on this new dataset saved on gcp bucket.
 
 ## Overall discussion of project
 
@@ -622,7 +622,8 @@ For load testing, we used **Locust** to emulate realistic traffic patterns with 
 >
 > Answer:
 
---- question 27 fill here ---
+In total we spent 14$ of credits, as we only run trainings, or built images when we were quite sure with the our work, also the model is not huge so that did not cost too much.
+In general, we tried to have a really parsimonious approach to the cloud as, especially at the beginning we were scared of running out of credit, so in the end we ended up much less than we thought.
 
 ### Question 28
 
