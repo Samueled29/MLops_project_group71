@@ -570,7 +570,21 @@ We implemented a **FastAPI** service to expose the trained model for inference.
 >
 > Answer:
 
---- question 24 fill here ---
+We deployed our API locally, using FastAPI, adding endpoints so that it is possible to make predictions from the model using this API, just by uploading a picture. Furthermore, we added a small frontend (local). For what concerns cloud deployment, we did for the API concerning monitoring (data drifting), whereas the API to make predictions has been only deployed locally.
+to invoke the predict it can be used: 
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@/path/to/image.png;type=image/png"
+for predict_log:
+curl -X POST https://drift-api-562538755536.europe-west1.run.app/predict_log \
+  -H "Content-Type: application/json" \
+  -d '{
+        "image_tensor": [0.0, 0.1, ...],
+        "prediction": 1,
+        "timestamp": "2026-01-23T12:00:00Z"
+      }'
+  for drift_check:
+  curl -X POST "https://drift-api-562538755536.europe-west1.run.app/drift_check?n_predictions=100"
 
 ### Question 25
 
