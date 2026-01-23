@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import torch
 import hydra
 import wandb
-import os
 from pathlib import Path
 from typing import Dict, List
 from omegaconf import DictConfig, OmegaConf
