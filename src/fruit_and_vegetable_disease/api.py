@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import csv
 import os
 import logging
 from contextlib import asynccontextmanager
@@ -9,21 +8,13 @@ from pathlib import Path
 import numpy as np
 import torch
 import torch.nn.functional as F
-from fastapi import FastAPI, File, UploadFile, BackgroundTasks, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from datetime import datetime
 from PIL import Image, UnidentifiedImageError
 
 from fruit_and_vegetable_disease.model import Model
-from fruit_and_vegetable_disease.aggregate_predictions import aggregate_tensors
-import pandas as pd
-from evidently.legacy.test_suite import TestSuite
-from evidently.legacy.tests import (
-    TestNumberOfMissingValues,
-    TestShareOfDriftedColumns,
-)
 
 logger = logging.getLogger("uvicorn.error")
 
