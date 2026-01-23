@@ -1,4 +1,5 @@
-# configs/model/vit_base.yaml
-name: vit_base
-model_name: google/vit-base-patch16-224
+_target_: fruit_and_vegetable_disease.model.Model
+model_name: WinKawaks/vit-tiny-patch16-224
 pretrained: true
+
+

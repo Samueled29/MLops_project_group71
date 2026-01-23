@@ -6,7 +6,7 @@ from transformers import ViTForImageClassification, ViTImageProcessor
 class Model(nn.Module):
     """Vision Transformer model for fruit and vegetable disease classification."""
 
-    def __init__(self, num_classes: int = 1000, pretrained: bool = True):
+    def __init__(self, num_classes: int = 1000, model_name = "WinKawaks/vit-tiny-patch16-224", pretrained: bool = True):
         """Initialize the ViT model.
 
         Args:
@@ -14,8 +14,9 @@ class Model(nn.Module):
             pretrained: Whether to load pretrained weights.
         """
         super().__init__()
-        model_name = "google/vit-base-patch16-224"  # Base model (86M params)
-        model_name = "WinKawaks/vit-tiny-patch16-224"  # Tiny model (5M params)
+        
+        self.model_name = model_name
+
 
         if pretrained:
             self.model = ViTForImageClassification.from_pretrained(

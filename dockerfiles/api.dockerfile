@@ -12,6 +12,8 @@ RUN pip install --no-cache-dir uv && uv sync --frozen
 
 COPY models ./models
 
+COPY frontend ./frontend
+
 EXPOSE 8000
 
 CMD ["uv", "run", "uvicorn", "fruit_and_vegetable_disease.api:app", "--host", "0.0.0.0", "--port", "8000"]
