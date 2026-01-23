@@ -97,24 +97,24 @@ will check the repositories and the code to verify your answers.
 
 ### Week 3
 
-* [ ] Check how robust your model is towards data drifting (M27)
-* [ ] Setup collection of input-output data from your deployed application (M27)
-* [ ] Deploy to the cloud a drift detection API (M27)
+* [x] Check how robust your model is towards data drifting (M27)
+* [x] Setup collection of input-output data from your deployed application (M27)
+* [x] Deploy to the cloud a drift detection API (M27)
 * [ ] Instrument your API with a couple of system metrics (M28)
 * [ ] Setup cloud monitoring of your instrumented application (M28)
 * [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
-* [ ] If applicable, optimize the performance of your data loading using distributed data loading (M29)
+* [x] If applicable, optimize the performance of your data loading using distributed data loading (M29)
 * [ ] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
 * [ ] Play around with quantization, compilation and pruning for you trained models to increase inference speed (M31)
 
 ### Extra
 
-* [ ] Write some documentation for your application (M32)
+* [x] Write some documentation for your application (M32)
 * [ ] Publish the documentation to GitHub Pages (M32)
 * [ ] Revisit your initial project description. Did the project turn out as you wanted?
-* [ ] Create an architectural diagram over your MLOps pipeline
-* [ ] Make sure all group members have an understanding about all parts of the project
-* [ ] Uploaded all your code to GitHub
+* [x] Create an architectural diagram over your MLOps pipeline
+* [x] Make sure all group members have an understanding about all parts of the project
+* [x] Uploaded all your code to GitHub
 
 ## Group information
 
@@ -134,7 +134,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
-s242916
+s242916, s253125, s253762, s243599, s253136
 
 ### Question 3
 > **Did you end up using any open-source frameworks/packages not covered in the course during your project? If so**
@@ -220,7 +220,7 @@ These practices are especially important in larger projects where multiple devel
 >
 > Answer:
 
-We have implemented 23 tests that test the source code located in the src folder. The file test_data.py checks if the the download of the files works correctly and if the proper directories are created. It also checks if the images and labels have correct properties, and if data splitting and normalizing create a desired output. The test_model.py checks if the model output has correct type and shape and the test_train.py checks the properties of input and output of the training process as well as the resizing of the images and the accuracy calculation.
+We have implemented 49 tests that test the source code located in the src folder. The file test_data.py checks if the the download of the files works correctly and if the proper directories are created. It also checks if the images and labels have correct properties, and if data splitting and normalizing create a desired output. The test_model.py checks if the model output has correct type and shape and the test_train.py checks the properties of input and output of the training process as well as the resizing of the images and the accuracy calculation.
 
 ### Question 8
 
@@ -235,7 +235,7 @@ We have implemented 23 tests that test the source code located in the src folder
 >
 > Answer:
 
-The total coverage of our code is 49%, which does not cover all our source code (no tests for evaluate.py). We are far from 100% coverage of our code and even if we were then it does not mean the code is bug free. Some not obvious test cases could be missed and lead to errors.
+The total coverage of our code is 39%, which does not cover all our source code (no tests for evaluate.py). We are far from 100% coverage of our code and even if we were then it does not mean the code is bug free. Some not obvious test cases could be missed and lead to errors.
 
 ### Question 9
 
@@ -420,7 +420,17 @@ A **fixed random seed** is defined in the configuration and applied at runtime t
 >
 > Answer:
 
---- question 14 fill here ---
+![wandb](figures/wandb.jpeg)
+
+We track metrics that describe how well our model is learning and how training evolves over time, both at a fine-grained level and in aggregate.
+
+First, we log loss because it measures the training objective directly and tells us how wrong the model’s predictions are. Batch loss is computed on each mini-batch and gives immediate feedback about optimization dynamics. It can be noisy, but spikes may reveal instability (e.g., learning rate issues) or problematic batches in the data pipeline. Epoch loss averages the loss over an entire epoch, producing a smoother signal that is easier to interpret and compare across runs. A consistent decrease in epoch loss indicates that training is converging.
+
+Second, we log accuracy to track classification performance. Batch accuracy shows short-term predictive behavior on individual batches and helps us confirm that improvements in loss translate into better predictions, even though it fluctuates due to batch variability. Epoch accuracy aggregates accuracy over the full epoch and serves as our main indicator of overall training performance, making it useful for comparing experiments and hyperparameter settings.
+
+Finally, we log progress indicators such as the current epoch and batch step. These metrics do not reflect model quality directly, but they provide essential context for interpreting the curves, aligning results across experiments, and ensuring that logging occurs at the intended frequency.
+
+Overall, batch-level metrics help us diagnose training behavior in detail, while epoch-level metrics provide stable signals for monitoring convergence and reporting results.
 
 ### Question 15
 
@@ -435,7 +445,7 @@ A **fixed random seed** is defined in the configuration and applied at runtime t
 >
 > Answer:
 
---- question 15 fill here ---
+For the project, we used different docker images. one for training, for which we set up a trigger with GCP, so that every time a push happens on the main branch of the repository, a docker image is built on the cloud (then we only saved the latest ones). Another image is for the api to run them. Finally, another image has been created when deploying the api to check drift in the data during the monitorin part, so it has been uploaded to GCP as well.
 
 ### Question 16
 
@@ -450,7 +460,10 @@ A **fixed random seed** is defined in the configuration and applied at runtime t
 >
 > Answer:
 
---- question 16 fill here ---
+Most bugs surfaced during experiments, so we used fast, reproducible loops: `uv run pytest` for unit tests, `uv run pytest tests/test_train.py -k small` to isolate failing cases, and reran `uv run python src/fruit_and_vegetable_disease/train.py` with verbose logging to inspect **Hydra** configs and warnings.
+
+We did not assume the code was perfect: we enabled the built-in **PyTorch profiler** for the first five batches, saved traces to `logs/profiler`, and viewed them in **TensorBoard**. The traces showed no dominant CPU or CUDA hotspot, so we keep profiling off by default to speed up iterations.
+
 
 ## Working in the cloud
 
@@ -467,7 +480,7 @@ A **fixed random seed** is defined in the configuration and applied at runtime t
 >
 > Answer:
 
-GCP Cloud Storage - enables creating buckets for storing data.
+We used the following services: Storage to create a bucket for storing the data using dvc, Build to create docker images of the current state of the main branch of the project's repository, Engine and Vertex AI for running the experiments and Artifact Registry for storing the docker images with the training experiments.
 
 ### Question 18
 
@@ -482,7 +495,8 @@ GCP Cloud Storage - enables creating buckets for storing data.
 >
 > Answer:
 
---- question 18 fill here ---
+We used Google Cloud Compute Engine to run model training on a virtual machine so that we would have more resources than the ones available on our local machines. So we have a stable and reproducible environment for executing training and preprocessing workloads.
+The setup for the vm to run the training was: a vm of type e2-highmen-8 equipped with 8 vCPU, 64 GB of RAM, and 100 GB of disk space, running on Debian 12 (x86_64). The insrtance did not include GPU accelerators, so we only used CPU-based computations.  
 
 ### Question 19
 
@@ -500,7 +514,7 @@ GCP Cloud Storage - enables creating buckets for storing data.
 >
 > Answer:
 
---- question 20 fill here ---
+![registry](figures/registry.jpeg)
 
 ### Question 21
 
@@ -509,7 +523,7 @@ GCP Cloud Storage - enables creating buckets for storing data.
 >
 > Answer:
 
---- question 21 fill here ---
+![build](figures/build.jpeg)
 
 ### Question 22
 
@@ -524,7 +538,7 @@ GCP Cloud Storage - enables creating buckets for storing data.
 >
 > Answer:
 
---- question 22 fill here ---
+We trained our model using Cloud Engine. We chose Engine instead ov Vertex AI because, initially of quotas issues, and it was much harder to debug on vertex AI compared to Engine, so that if errors occur it is harder to understand where they happen and how to fix them. So, since we only needed more computational power, we stick with training on a VM to ease our workflow. We set up the hardware so that it would not take too long to train the model, and so that it had enough space to store the dataset to use for training.
 
 ## Deployment
 
@@ -567,7 +581,21 @@ We implemented a **FastAPI** service to expose the trained model for inference.
 >
 > Answer:
 
---- question 24 fill here ---
+We deployed our API locally, using FastAPI, adding endpoints so that it is possible to make predictions from the model using this API, just by uploading a picture. Furthermore, we added a small frontend (local). For what concerns cloud deployment, we did for the API concerning monitoring (data drifting), whereas the API to make predictions has been only deployed locally.
+to invoke the predict it can be used: 
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@/path/to/image.png;type=image/png"
+for predict_log:
+curl -X POST https://drift-api-562538755536.europe-west1.run.app/predict_log \
+  -H "Content-Type: application/json" \
+  -d '{
+        "image_tensor": [0.0, 0.1, ...],
+        "prediction": 1,
+        "timestamp": "2026-01-23T12:00:00Z"
+      }'
+  for drift_check:
+  curl -X POST "https://drift-api-562538755536.europe-west1.run.app/drift_check?n_predictions=100"
 
 ### Question 25
 
@@ -582,7 +610,10 @@ We implemented a **FastAPI** service to expose the trained model for inference.
 >
 > Answer:
 
---- question 25 fill here ---
+We implemented unit testing using pytest together with **FastAPI’s TestClient** to validate all API endpoints. The test suite (`tests/test_api.py`) contains six unit tests that cover the health and readiness endpoints, the prediction endpoint with valid image inputs, correct error handling for invalid content types (returning `HTTP 400`), proper behavior when the model is unavailable (returning `HTTP 503`), and validation of prediction outputs such as confidence values remaining within 0–1 and labels belonging to the expected set.
+All tests pass and can be executed via `uv run pytest tests/test_api.py`.
+
+For load testing, we used **Locust** to emulate realistic traffic patterns with weighted tasks for health checks, readiness checks, and image predictions. Under 50 concurrent users over 60 seconds, the API served 1,385 requests with zero failures, achieving 23.2 requests/second and maintaining low median latencies, including sub-25 ms for predictions.
 
 ### Question 26
 
@@ -597,7 +628,7 @@ We implemented a **FastAPI** service to expose the trained model for inference.
 >
 > Answer:
 
---- question 26 fill here ---
+We implemented monitoring. First, since our model works with classification of images, we tried to implement an artificial drift of the images,using create_drifted_dataset.py (adding blur and other modifications) so that we would have a drifted dataset, then we run the script check_data_drift.py we generate an html report to see if the dataset has actually drifted, and we do a test with the script check_data_quality.py. After this was done, we tested our model on the original and drifted dataset, and we saw that the model performance were somewhat similar, so that the model was robust to this kind of drift. However, drift in dataset balance has not been tested. Then we wrote an API to log new data and to run a drift test on this new dataset saved on gcp bucket.
 
 ## Overall discussion of project
 
@@ -616,7 +647,8 @@ We implemented a **FastAPI** service to expose the trained model for inference.
 >
 > Answer:
 
---- question 27 fill here ---
+In total we spent 14$ of credits, as we only run trainings, or built images when we were quite sure with the our work, also the model is not huge so that did not cost too much.
+In general, we tried to have a really parsimonious approach to the cloud as, especially at the beginning we were scared of running out of credit, so in the end we ended up much less than we thought.
 
 ### Question 28
 
@@ -654,7 +686,14 @@ We implemented a minimal **frontend** to provide an end-to-end demo for non-tech
 >
 > Answer:
 
---- question 29 fill here ---
+![architecture](figures/architecture.png)
+The developer works on their local machine, writing the application code, model, and training procedure. Configuration management is handled using Hydra, which allows structured control over hyperparameters, paths, and execution modes. During model training, Weights & Biases is used to track metrics, logs, artifacts, and to launch hyperparameter sweeps, enabling a systematic comparison between different experiments.
+
+Once changes are completed, the code is versioned using Git. Before committing, local automated checks can be executed, such as pre-commit hooks for linting or preliminary tests. Afterwards, the code is committed and pushed to GitHub, which serves as the central coordination point for the project.
+
+The push to GitHub automatically triggers a Continuous Integration pipeline via GitHub Actions. During this phase, the code is validated by running automated tests and quality checks. If the pipeline passes successfully, GitHub initiates the build process on Google Cloud Platform, where the application is containerized into a Docker image that includes the code, dependencies, and the model. The resulting image is then stored in the cloud.
+
+From the container registry, the Docker image can be pulled and executed. The running service exposes a backend API, which serves as the access point to the model in production. A frontend or external client interacts with this API by sending requests and receiving the model’s predictions.
 
 ### Question 30
 
@@ -668,7 +707,7 @@ We implemented a minimal **frontend** to provide an end-to-end demo for non-tech
 >
 > Answer:
 
---- question 30 fill here ---
+We had various struggles at different points of the project development. At first, when we approached the topic of training in the cloud, we wanted to use Vertex AI, however it seemed much more complex and after a few trials, we switched to Compute Engine for the rest of the project. Then, close to the end of the project development, we encountered a undesired behaviour of our model - the accuracy was 1.0 from the first epoch. The challenge was to locate the exact point when the model started to deviate due to many commits and pull requestes during the last few days of the project. The process of finding the problem in our code's logic took significantly more time than expected. We believe that the biggest challenge in the project, that also led to the previously described issue, was that we were updating the data.py and train.py continuously due to the new tools introduced in the course, and all of us had a different goal (to set up another feature or tool) when making the changes in these files.
 
 ### Question 31
 
@@ -686,4 +725,17 @@ We implemented a minimal **frontend** to provide an end-to-end demo for non-tech
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
+Student s242916 was responsible for the all the data management processes in the project development: created initial data downloading and preprocessing, set up the data version control, created a GCP bucket and created a code for downloading the data directly from the cloud. Also: created unit tests for the data, model and train scripts, and answered the report questions.
+
+student s253762 added a predictive model in model.py, introduced structured logging to track important events during execution and integrated Weights & Biases to monitor training progress, log relevant metrics, and store artifacts. Evaluated the use of hyperparameter optimization by considering a sweep setup. In addition, wrote automated API tests for the application and configured continuous integration to run these tests. Additionally performed load testing to assess the robustness and performance of the deployed API under concurrent requests and also evaluated whether distributed data loading was applicable for this project and concluded that it was not necessary in the given setup. Furthermore, collaborated with student s243599 to configure a cloud-based trigger that automatically builds the Docker image whenever the main branch on GitHub is updated.
+
+Student s253125 was responsible for setting up the model serving API, including a minimal frontend to provide an end-to-end demonstration of the system. The student implemented the Dockerfile to containerize the application and ensure reproducible deployment. Additionally, the student created the Hydra configuration files and configured GitHub Actions for continuous integration, including linting, unit tests, and pre-commit checks.
+
+student s243599 was in charge of creating a git repository,  writing the initial training of the model,  setup trigger for automatically build docker containers when push on main (together with s253762), write apis for monitoring data drifting, the monitoring part: create dataset drifted and generate report, test model on this dataset, setting up bucket container for predictions, deploy with cloud api to test data drifting.
+
+Student s253136 was responsible for creating and building the Docker images, training the model on a Google Cloud Compute Engine VM, and making refinements to the data.py and train.py scripts to ensure smooth data processing and training.
+
+
+All members contributed to the code by adding fixes, testing the code, looking for solutions to issues. responded to some of the required reflective and technical questions associated with the project.
+
+We have used ChatGPT and Github Copilot to help debug and write parts of our code
