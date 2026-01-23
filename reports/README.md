@@ -470,7 +470,7 @@ We did not assume the code was perfect: we enabled the built-in **PyTorch profil
 >
 > Answer:
 
-GCP Cloud Storage - enables creating buckets for storing data.
+We used the following services: Storage to create a bucket for storing the data using dvc, Build to create docker images of the current state of the main branch of the project's repository, Engine and Vertex AI for running the experiments and Artifact Registry for storing the docker images with the training experiments.
 
 ### Question 18
 
