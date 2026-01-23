@@ -675,7 +675,7 @@ We implemented a minimal **frontend** to provide an end-to-end demo for non-tech
 >
 > Answer:
 
---- question 30 fill here ---
+We had various struggles at different points of the project development. At first, when we approached the topic of training in the cloud, we wanted to use Vertex AI, however it seemed much more complex and after a few trials, we switched to Compute Engine for the rest of the project. Then, close to the end of the project development, we encountered a undesired behaviour of our model - the accuracy was 1.0 from the first epoch. The challenge was to locate the exact point when the model started to deviate due to many commits and pull requestes during the last few days of the project. The process of finding the problem in our code's logic took significantly more time than expected. We believe that the biggest challenge in the project, that also led to the previously described issue, was that we were updating the data.py and train.py continuously due to the new tools introduced in the course, and all of us had a different goal (to set up another feature or tool) when making the changes in these files.
 
 ### Question 31
 
