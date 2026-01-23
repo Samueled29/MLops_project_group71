@@ -725,4 +725,15 @@ We had various struggles at different points of the project development. At firs
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
+Student s242916 was responsible for the all the data management processes in the project development: created initial data downloading and preprocessing, set up the data version control, created a GCP bucket and created a code for downloading the data directly from the cloud. Also: created unit tests for the data, model and train scripts, and answered the report questions.
+
+student s253762 added a predictive model in model.py, introduced structured logging to track important events during execution and integrated Weights & Biases to monitor training progress, log relevant metrics, and store artifacts. Evaluated the use of hyperparameter optimization by considering a sweep setup. In addition, wrote automated API tests for the application and configured continuous integration to run these tests. Additionally performed load testing to assess the robustness and performance of the deployed API under concurrent requests and also evaluated whether distributed data loading was applicable for this project and concluded that it was not necessary in the given setup. Furthermore, collaborated with student s243599 to configure a cloud-based trigger that automatically builds the Docker image whenever the main branch on GitHub is updated.
+
+student s243599 was in charge of creating a git repository,  writing the initial training of the model,  setup trigger for automatically build docker containers when push on main (together with s253762), write apis for monitoring data drifting, the monitoring part: create dataset drifted and generate report, test model on this dataset, setting up bucket container for predictions, deploy with cloud api to test data drifting.
+
+Student s253136 was responsible for creating and building the Docker images, training the model on a Google Cloud Compute Engine VM, and making refinements to the data.py and train.py scripts to ensure smooth data processing and training.
+
+
+All members contributed to the code by adding fixes, testing the code, looking for solutions to issues. responded to some of the required reflective and technical questions associated with the project.
+
+We have used ChatGPT and Github Copilot to help debug and write parts of our code
