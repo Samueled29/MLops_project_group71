@@ -675,7 +675,14 @@ We implemented a minimal **frontend** to provide an end-to-end demo for non-tech
 >
 > Answer:
 
---- question 29 fill here ---
+![architecture](figures/architecture.png)
+Lo sviluppatore lavora sulla propria macchina locale scrivendo il codice dell’applicazione, del modello e della procedura di training. La gestione delle configurazioni viene effettuata tramite Hydra, che consente di controllare in modo strutturato iperparametri, percorsi e modalità di esecuzione. Durante l’addestramento del modello, Weights & Biases viene utilizzato per tracciare metriche, log, artefatti e per lanciare sweep di iperparametri, permettendo un confronto sistematico tra diversi esperimenti.
+
+Una volta completate le modifiche, il codice viene versionato tramite Git. Prima del commit possono essere eseguiti controlli automatici locali, come pre-commit hook per il linting o test preliminari. Successivamente il codice viene committato e pushato su GitHub, che funge da punto centrale di coordinamento per il progetto.
+
+Il push su GitHub attiva automaticamente una pipeline di Continuous Integration tramite GitHub Actions. In questa fase il codice viene validato eseguendo test automatici e controlli di qualità. Se la pipeline ha esito positivo, GitHub attiva il processo di build su Google Cloud Platform. Qui l’applicazione viene containerizzata creando una Docker image che include il codice, le dipendenze e il modello, e l’immagine risultante viene salvata sul cloud.
+
+Dal container registry l’immagine Docker può essere scaricata ed eseguita. Il servizio avviato espone un’API backend, che rappresenta il punto di accesso al modello in produzione. Un frontend o un client esterno interagisce con questa API inviando richieste e ricevendo le predizioni del modello.
 
 ### Question 30
 
